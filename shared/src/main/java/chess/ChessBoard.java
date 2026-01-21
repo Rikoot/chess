@@ -1,6 +1,5 @@
 package chess;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -52,7 +51,6 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
         Board.put(position, piece);
-//        throw new RuntimeException("Not implemented");
     }
 
     /**
@@ -64,7 +62,6 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
         return Board.get(position);
-//        throw new RuntimeException("Not implemented");
     }
 
     /**
@@ -77,7 +74,6 @@ public class ChessBoard {
         setBoardPosition(ChessGame.TeamColor.WHITE);
         // Add black pieces
         setBoardPosition(ChessGame.TeamColor.BLACK);
-        //throw new RuntimeException("Not implemented");
     }
     private void setBoardPosition(ChessGame.TeamColor color) {
         int row;
