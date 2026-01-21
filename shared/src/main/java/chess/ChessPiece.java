@@ -12,7 +12,7 @@ import java.util.Objects;
 public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
-    private final PieceType pieceValue;
+    private final PieceType pieceTypeValue;
 
     @Override
     public boolean equals(Object o) {
@@ -20,17 +20,22 @@ public class ChessPiece {
             return false;
         }
         ChessPiece that = (ChessPiece) o;
-        return pieceColor == that.pieceColor && pieceValue == that.pieceValue;
+        return pieceColor == that.pieceColor && pieceTypeValue == that.pieceTypeValue;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(pieceColor, pieceValue);
+        return Objects.hash(pieceColor, pieceTypeValue);
+    }
+
+    @Override
+    public String toString() {
+        return pieceTypeValue.toString();
     }
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
-        pieceValue = type;
+        pieceTypeValue = type;
     }
 
     /**
@@ -57,7 +62,7 @@ public class ChessPiece {
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return pieceValue;
+        return pieceTypeValue;
 //        throw new RuntimeException("Not implemented");
     }
 
