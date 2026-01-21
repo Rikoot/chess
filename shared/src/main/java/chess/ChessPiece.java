@@ -11,8 +11,8 @@ import java.util.Objects;
  */
 public class ChessPiece {
 
-    private final ChessGame.TeamColor PieceColor;
-    private final PieceType PieceValue;
+    private final ChessGame.TeamColor pieceColor;
+    private final PieceType pieceValue;
 
     @Override
     public boolean equals(Object o) {
@@ -20,17 +20,17 @@ public class ChessPiece {
             return false;
         }
         ChessPiece that = (ChessPiece) o;
-        return PieceColor == that.PieceColor && PieceValue == that.PieceValue;
+        return pieceColor == that.pieceColor && pieceValue == that.pieceValue;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(PieceColor, PieceValue);
+        return Objects.hash(pieceColor, pieceValue);
     }
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        PieceColor = pieceColor;
-        PieceValue = type;
+        this.pieceColor = pieceColor;
+        pieceValue = type;
     }
 
     /**
@@ -49,7 +49,7 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return PieceColor;
+        return pieceColor;
 //        throw new RuntimeException("Not implemented");
     }
 
@@ -57,7 +57,7 @@ public class ChessPiece {
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return PieceValue;
+        return pieceValue;
 //        throw new RuntimeException("Not implemented");
     }
 

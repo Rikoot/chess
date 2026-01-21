@@ -1,6 +1,5 @@
 package chess;
 
-import javax.swing.text.Position;
 import java.util.Objects;
 
 /**
@@ -10,8 +9,8 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPosition {
-    private final int PositionRow;
-    private final int PositionColumn;
+    private final int positionRow;
+    private final int positionColumn;
 
     @Override
     public boolean equals(Object o) {
@@ -19,17 +18,17 @@ public class ChessPosition {
             return false;
         }
         ChessPosition that = (ChessPosition) o;
-        return PositionRow == that.PositionRow && PositionColumn == that.PositionColumn;
+        return positionRow == that.positionRow && positionColumn == that.positionColumn;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(PositionRow, PositionColumn);
+        return Objects.hash(positionRow, positionColumn);
     }
 
     public ChessPosition(int row, int col) {
-        PositionRow = row;
-        PositionColumn = col;
+        positionRow = row;
+        positionColumn = col;
     }
 
     /**
@@ -37,7 +36,7 @@ public class ChessPosition {
      * 1 codes for the bottom row
      */
     public int getRow() {
-        return PositionRow;
+        return positionRow;
 //        throw new RuntimeException("Not implemented");
     }
 
@@ -46,7 +45,7 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-        return PositionColumn;
+        return positionColumn;
 //        throw new RuntimeException("Not implemented");
     }
 }
