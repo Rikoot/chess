@@ -97,6 +97,7 @@ public class ChessPiece {
                 rookMoves(movesCollection, board, myPosition, direction, row, col);
                 break;
             case KING:
+                kingMoves(movesCollection, board, myPosition, direction, row, col);
                 break;
         }
         return movesCollection;
@@ -189,6 +190,25 @@ public class ChessPiece {
             if (invalidMove(movesCollection, board, myPosition, nextMove)) {
                 break;
             }
+        }
+    }
+    private void kingMoves(Collection<ChessMove> movesCollection, ChessBoard board, ChessPosition myPosition, int direction, int row, int col) {
+        int[] offsets = {1, -1};
+        for (int offset : offsets) {
+            ChessPosition nextMove = new ChessPosition(row, col + offset);
+            invalidMove(movesCollection, board, myPosition, nextMove);
+        }
+        for (int offset : offsets) {
+            ChessPosition nextMove = new ChessPosition(row + offset, col);
+            invalidMove(movesCollection, board, myPosition, nextMove);
+        }
+        for (int offset : offsets) {
+            ChessPosition nextMove = new ChessPosition(row + offset, col + offset);
+            invalidMove(movesCollection, board, myPosition, nextMove);
+        }
+        for (int offset : offsets) {
+            ChessPosition nextMove = new ChessPosition(row - offset, col + offset);
+            invalidMove(movesCollection, board, myPosition, nextMove);
         }
     }
 
