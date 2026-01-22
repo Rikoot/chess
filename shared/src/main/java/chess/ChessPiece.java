@@ -92,6 +92,8 @@ public class ChessPiece {
                 rookMoves(movesCollection, board, myPosition, direction, row, col);
                 break;
             case QUEEN:
+                bishopMoves(movesCollection, board, myPosition, direction, row, col);
+                rookMoves(movesCollection, board, myPosition, direction, row, col);
                 break;
             case KING:
                 break;
@@ -100,11 +102,11 @@ public class ChessPiece {
     }
     private void pawnMoves (Collection<ChessMove> movesCollection, ChessBoard board, ChessPosition myPosition, int direction, int row, int col) {
         ChessPosition leftMove = new ChessPosition(row + (1*direction), col - 1);
-        if (validPositon(leftMove) && piecePresent(board, leftMove)) {
+        if (validPositon(leftMove) && piecePresent(board, leftMove) && capturablePiece(board, leftMove)) {
             movesCollection.add(new ChessMove(myPosition, leftMove, null));
         }
         ChessPosition rightMove = new ChessPosition(row + (1*direction), col - 1);
-        if (validPositon(rightMove) && piecePresent(board, rightMove)) {
+        if (validPositon(rightMove) && piecePresent(board, rightMove) && capturablePiece(board, rightMove)) {
             movesCollection.add(new ChessMove(myPosition, rightMove, null));
         }
         ChessPosition forwardMove = new ChessPosition(row + (1*direction), col);
