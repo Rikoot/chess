@@ -10,14 +10,14 @@ import java.util.Objects;
  */
 public class ChessBoard {
 
-    HashMap<ChessPosition, ChessPiece> Board = new HashMap<>();
+    HashMap<ChessPosition, ChessPiece> board = new HashMap<>();
     public ChessBoard() {
         createBoard();
     }
     private void createBoard() {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
-                Board.put(new ChessPosition(row, col), null);
+                board.put(new ChessPosition(row, col), null);
             }
         }
     }
@@ -28,18 +28,18 @@ public class ChessBoard {
             return false;
         }
         ChessBoard that = (ChessBoard) o;
-        return Objects.equals(Board, that.Board);
+        return Objects.equals(board, that.board);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(Board);
+        return Objects.hashCode(board);
     }
 
     @Override
     public String toString() {
         return "ChessBoard{" +
-                "Board=" + Board +
+                "Board=" + board +
                 '}';
     }
 
@@ -50,7 +50,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        Board.put(position, piece);
+        board.put(position, piece);
     }
 
     /**
@@ -61,7 +61,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return Board.get(position);
+        return board.get(position);
     }
 
     /**
@@ -86,7 +86,7 @@ public class ChessBoard {
             pawnRow = 7;
         }
         for (int col = 1; col <= 8; col++) {
-            Board.put(new ChessPosition(pawnRow, col), new ChessPiece(color, ChessPiece.PieceType.PAWN));
+            board.put(new ChessPosition(pawnRow, col), new ChessPiece(color, ChessPiece.PieceType.PAWN));
         }
         for (int col = 1; col <= 8; col++) {
             ChessPiece.PieceType type = switch (col) {
@@ -97,7 +97,7 @@ public class ChessBoard {
                 case 5 -> ChessPiece.PieceType.KING;
                 default -> ChessPiece.PieceType.PAWN;
             };
-            Board.put(new ChessPosition(row, col), new ChessPiece(color, type));
+            board.put(new ChessPosition(row, col), new ChessPiece(color, type));
         }
     }
 }

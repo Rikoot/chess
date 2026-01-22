@@ -109,7 +109,8 @@ public class ChessPiece {
         }
         return movesCollection;
     }
-    private void pawnMoves(Collection<ChessMove> movesCollection, ChessBoard board, ChessPosition myPosition, int direction, int row, int col, PieceType promotion) {
+    private void pawnMoves(Collection<ChessMove> movesCollection, ChessBoard board,
+                           ChessPosition myPosition, int direction, int row, int col, PieceType promotion) {
 
         ChessPosition leftMove = new ChessPosition(row + (1*direction), col - 1);
         if (validPositon(leftMove) && piecePresent(board, leftMove) && capturablePiece(board, leftMove)) {
@@ -129,7 +130,8 @@ public class ChessPiece {
             movesCollection.add(new ChessMove(myPosition, doubleMove, null));
         }
     }
-    private void bishopMoves(Collection<ChessMove> movesCollection, ChessBoard board, ChessPosition myPosition, int direction, int row, int col) {
+    private void bishopMoves(Collection<ChessMove> movesCollection, ChessBoard board,
+                             ChessPosition myPosition, int direction, int row, int col) {
         for (int offset = 1; offset < 8; offset++) {
             ChessPosition nextMove = new ChessPosition(row + offset, col + offset);
             if (invalidMove(movesCollection, board, myPosition, nextMove)) {
@@ -155,7 +157,8 @@ public class ChessPiece {
             }
         }
     }
-    private void knightMoves(Collection<ChessMove> movesCollection, ChessBoard board, ChessPosition myPosition, int direction, int row, int col) {
+    private void knightMoves(Collection<ChessMove> movesCollection, ChessBoard board,
+                             ChessPosition myPosition, int direction, int row, int col) {
         int[] offsets = {-1, 1};
         for (int offset : offsets) {
             ChessPosition nextMove = new ChessPosition(row + 2, col + offset);
@@ -174,7 +177,8 @@ public class ChessPiece {
             invalidMove(movesCollection, board, myPosition, nextMove);
         }
     }
-    private void rookMoves(Collection<ChessMove> movesCollection, ChessBoard board, ChessPosition myPosition, int direction, int row, int col) {
+    private void rookMoves(Collection<ChessMove> movesCollection, ChessBoard board,
+                           ChessPosition myPosition, int direction, int row, int col) {
         for (int offset = 1; offset < 8; offset++) {
             ChessPosition nextMove = new ChessPosition(row + offset, col);
             if (invalidMove(movesCollection, board, myPosition, nextMove)) {
@@ -200,7 +204,8 @@ public class ChessPiece {
             }
         }
     }
-    private void kingMoves(Collection<ChessMove> movesCollection, ChessBoard board, ChessPosition myPosition, int direction, int row, int col) {
+    private void kingMoves(Collection<ChessMove> movesCollection, ChessBoard board,
+                           ChessPosition myPosition, int direction, int row, int col) {
         int[] offsets = {1, -1};
         for (int offset : offsets) {
             ChessPosition nextMove = new ChessPosition(row, col + offset);
@@ -220,7 +225,8 @@ public class ChessPiece {
         }
     }
 
-    private boolean invalidMove(Collection<ChessMove> movesCollection, ChessBoard board, ChessPosition myPosition, ChessPosition nextMove) {
+    private boolean invalidMove(Collection<ChessMove> movesCollection, ChessBoard board,
+                                ChessPosition myPosition, ChessPosition nextMove) {
         if (validPositon(nextMove)) {
             if (piecePresent(board, nextMove)) {
                 if (capturablePiece(board, nextMove)) {
@@ -237,7 +243,8 @@ public class ChessPiece {
     }
 
     private boolean validPositon(ChessPosition nextPosition) {
-        return nextPosition.getColumn() <= 8 && nextPosition.getColumn() >= 1 && nextPosition.getRow() <= 8 && nextPosition.getRow() >= 1;
+        return nextPosition.getColumn() <= 8 && nextPosition.getColumn() >= 1
+                && nextPosition.getRow() <= 8 && nextPosition.getRow() >= 1;
     }
     private boolean piecePresent(ChessBoard board, ChessPosition nextPosition) {
         return board.getPiece(nextPosition) != null;
