@@ -87,6 +87,7 @@ public class ChessPiece {
                 bishopMoves(movesCollection, board, myPosition, direction, row, col);
                 break;
             case KNIGHT:
+                knightMoves(movesCollection, board, myPosition, direction, row, col);
                 break;
             case ROOK:
                 rookMoves(movesCollection, board, myPosition, direction, row, col);
@@ -100,7 +101,7 @@ public class ChessPiece {
         }
         return movesCollection;
     }
-    private void pawnMoves (Collection<ChessMove> movesCollection, ChessBoard board, ChessPosition myPosition, int direction, int row, int col) {
+    private void pawnMoves(Collection<ChessMove> movesCollection, ChessBoard board, ChessPosition myPosition, int direction, int row, int col) {
         ChessPosition leftMove = new ChessPosition(row + (1*direction), col - 1);
         if (validPositon(leftMove) && piecePresent(board, leftMove) && capturablePiece(board, leftMove)) {
             movesCollection.add(new ChessMove(myPosition, leftMove, null));
@@ -119,7 +120,7 @@ public class ChessPiece {
             movesCollection.add(new ChessMove(myPosition, doubleMove, null));
         }
     }
-    private void bishopMoves (Collection<ChessMove> movesCollection, ChessBoard board, ChessPosition myPosition, int direction, int row, int col) {
+    private void bishopMoves(Collection<ChessMove> movesCollection, ChessBoard board, ChessPosition myPosition, int direction, int row, int col) {
         for (int offset = 1; offset < 8; offset++) {
             ChessPosition nextMove = new ChessPosition(row + offset, col + offset);
             if (invalidMove(movesCollection, board, myPosition, nextMove)) {
@@ -145,7 +146,26 @@ public class ChessPiece {
             }
         }
     }
-    private void rookMoves (Collection<ChessMove> movesCollection, ChessBoard board, ChessPosition myPosition, int direction, int row, int col) {
+    private void knightMoves(Collection<ChessMove> movesCollection, ChessBoard board, ChessPosition myPosition, int direction, int row, int col) {
+        int[] offsets = {-1, 1};
+        for (int offset : offsets) {
+            ChessPosition nextMove = new ChessPosition(row + 2, col + offset);
+            invalidMove(movesCollection, board, myPosition, nextMove);
+        }
+        for (int offset : offsets) {
+            ChessPosition nextMove = new ChessPosition(row - 2, col + offset);
+            invalidMove(movesCollection, board, myPosition, nextMove);
+        }
+        for (int offset : offsets) {
+            ChessPosition nextMove = new ChessPosition(row + offset, col + 2);
+            invalidMove(movesCollection, board, myPosition, nextMove);
+        }
+        for (int offset : offsets) {
+            ChessPosition nextMove = new ChessPosition(row + offset, col - 2);
+            invalidMove(movesCollection, board, myPosition, nextMove);
+        }
+    }
+    private void rookMoves(Collection<ChessMove> movesCollection, ChessBoard board, ChessPosition myPosition, int direction, int row, int col) {
         for (int offset = 1; offset < 8; offset++) {
             ChessPosition nextMove = new ChessPosition(row + offset, col);
             if (invalidMove(movesCollection, board, myPosition, nextMove)) {
