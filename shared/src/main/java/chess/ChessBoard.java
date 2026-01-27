@@ -69,35 +69,28 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        // Start by adding the white pieces
         createBoard();
+        // Start by adding the white pieces
         setBoardPosition(ChessGame.TeamColor.WHITE);
         // Add black pieces
         setBoardPosition(ChessGame.TeamColor.BLACK);
     }
     private void setBoardPosition(ChessGame.TeamColor color) {
-        int row;
-        int pawnRow;
-        if (color == ChessGame.TeamColor.WHITE) {
-            row = 1;
-            pawnRow = 2;
-        } else {
-            row = 8;
-            pawnRow = 7;
-        }
+        int pawnRow = color == ChessGame.TeamColor.BLACK ? 7 : 2;
+        int row = color == ChessGame.TeamColor.BLACK ? 8 : 1;
+
         for (int col = 1; col <= 8; col++) {
             board.put(new ChessPosition(pawnRow, col), new ChessPiece(color, ChessPiece.PieceType.PAWN));
-        }
-        for (int col = 1; col <= 8; col++) {
-            ChessPiece.PieceType type = switch (col) {
-                case 1, 8 -> ChessPiece.PieceType.ROOK;
-                case 2, 7 -> ChessPiece.PieceType.KNIGHT;
-                case 3, 6 -> ChessPiece.PieceType.BISHOP;
-                case 4 -> ChessPiece.PieceType.QUEEN;
-                case 5 -> ChessPiece.PieceType.KING;
-                default -> ChessPiece.PieceType.PAWN;
+            ChessPiece piece = new ChessPiece(null, null);
+            piece = switch (col) {
+                case 1, 8 -> new ChessPiece(color, ChessPiece.PieceType.ROOK);
+                case 2, 7 -> new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+                case 3, 6 -> new ChessPiece(color, ChessPiece.PieceType.BISHOP);
+                case 4 -> new ChessPiece(color, ChessPiece.PieceType.QUEEN);
+                case 5 -> new ChessPiece(color, ChessPiece.PieceType.KING);
+                default -> piece;
             };
-            board.put(new ChessPosition(row, col), new ChessPiece(color, type));
+            board.put(new ChessPosition(row, col), piece);
         }
     }
 }
