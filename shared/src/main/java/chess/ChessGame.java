@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -11,11 +12,24 @@ import java.util.Collection;
 public class ChessGame {
     ChessGame.TeamColor currentTeam;
     ChessBoard board = new ChessBoard();
-    Collection<ChessMove> moveHistory;
 
     public ChessGame() {
         currentTeam = TeamColor.WHITE;
         board.resetBoard();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return currentTeam == chessGame.currentTeam && Objects.equals(board, chessGame.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currentTeam, board);
     }
 
     /**
@@ -93,7 +107,6 @@ public class ChessGame {
     public boolean isInStalemate(TeamColor teamColor) {
         return ChessRules.isInStalemate(board, teamColor);
     }
-
     /**
      * Sets this game's chessboard with a given board
      *
