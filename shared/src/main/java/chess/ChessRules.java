@@ -59,21 +59,15 @@ public class ChessRules {
 
 
     public static boolean isInCheckmate(ChessBoard board, ChessGame.TeamColor teamColor) {
-        if (isInCheck(board, teamColor)) {
-            Collection<ChessPosition> pieces = findPieces(board, teamColor);
-            for (ChessPosition piece : pieces) {
-                if (!validMoves(board, piece, teamColor).isEmpty()) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
+        return checkMoves(board, teamColor, true);
     }
 
     public static boolean isInStalemate(ChessBoard board, ChessGame.TeamColor teamColor) {
-        if (!isInCheck(board, teamColor)) {
+        return checkMoves(board, teamColor, false);
+    }
+
+    private static boolean checkMoves(ChessBoard board, ChessGame.TeamColor teamColor, boolean validCompare) {
+        if (isInCheck(board, teamColor) == validCompare) {
             Collection<ChessPosition> pieces = findPieces(board, teamColor);
             for (ChessPosition piece : pieces) {
                 if (!validMoves(board, piece, teamColor).isEmpty()) {
