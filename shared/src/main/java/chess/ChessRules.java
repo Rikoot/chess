@@ -60,7 +60,13 @@ public class ChessRules {
 
     public static boolean isInCheckmate(ChessBoard board, ChessGame.TeamColor teamColor) {
         if (isInCheck(board, teamColor)) {
-            return validMoves(board, findKing(board, teamColor), teamColor) == null;
+            Collection<ChessPosition> pieces = findPieces(board, teamColor);
+            for (ChessPosition piece : pieces) {
+                if (!validMoves(board, piece, teamColor).isEmpty()) {
+                    return false;
+                }
+            }
+            return true;
         } else {
             return false;
         }
@@ -68,23 +74,37 @@ public class ChessRules {
 
     public static boolean isInStalemate(ChessBoard board, ChessGame.TeamColor teamColor) {
         if (!isInCheck(board, teamColor)) {
-            return validMoves(board, findKing(board, teamColor), teamColor) == null;
+            Collection<ChessPosition> pieces = findPieces(board, teamColor);
+            for (ChessPosition piece : pieces) {
+                if (!validMoves(board, piece, teamColor).isEmpty()) {
+                    return false;
+                }
+            }
+            return true;
         } else {
             return false;
         }
     }
     public static Collection<ChessMove> calculateMoves(ChessBoard board, ChessGame.TeamColor teamColor) {
         Collection<ChessMove> moves = new HashSet<>();
+        Collection<ChessPosition> pieces = findPieces(board, teamColor);
+        for (ChessPosition piece : pieces) {
+            moves.addAll(board.getPiece(piece).pieceMoves(board, piece));
+        }
+        return moves;
+    }
+    public static Collection<ChessPosition> findPieces(ChessBoard board, ChessGame.TeamColor teamColor) {
+        Collection<ChessPosition> pieces = new HashSet<>();
         for (int col = 1; col <= 8; col++) {
             for (int row = 1; row <= 8; row++) {
                 ChessPosition position = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(position);
                 if (piece != null && piece.getTeamColor() == teamColor) {
-                    moves.addAll(piece.pieceMoves(board, position));
+                    pieces.add(position);
                 }
             }
         }
-        return  moves;
+        return pieces;
     }
     public static ChessPosition findKing(ChessBoard board, ChessGame.TeamColor teamColor) {
         for (int col = 1; col <= 8; col++) {
