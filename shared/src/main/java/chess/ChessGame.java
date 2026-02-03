@@ -75,6 +75,7 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessRules.makeMove(board, move, currentTeam);
+        setTeamTurn(currentTeam == ChessGame.TeamColor.BLACK ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK);
     }
 
     /**

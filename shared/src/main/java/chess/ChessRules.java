@@ -41,8 +41,8 @@ public class ChessRules {
         if (validMovesCollection.contains(move)) {
             // make move
             moveMaker(board, movePiece, move, currentTeam);
-            // switch team turns
-            currentTeam = currentTeam == ChessGame.TeamColor.BLACK ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+        } else {
+            throw  new InvalidMoveException("Invalid Move");
         }
     }
     public static boolean isInCheck(ChessBoard board, ChessGame.TeamColor teamColor) {
