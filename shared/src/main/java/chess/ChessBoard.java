@@ -1,5 +1,6 @@
 package chess;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -13,6 +14,16 @@ public class ChessBoard {
     private HashMap<ChessPosition, ChessPiece> board = new HashMap<>();
     public ChessBoard() {
         createBoard();
+    }
+    public ChessBoard deepCopy() {
+        ChessBoard copy = new ChessBoard();
+        for (Map.Entry<ChessPosition, ChessPiece> object : board.entrySet()) {
+            ChessPosition position = new ChessPosition(object.getKey().getRow(), object.getKey().getColumn());
+            ChessPiece piece = object.getValue();
+            piece = piece == null ? null : new ChessPiece(piece.getTeamColor(), piece.getPieceType());
+            copy.board.put(position, piece);
+        }
+        return copy;
     }
     private void createBoard() {
         for (int row = 1; row <= 8; row++) {
