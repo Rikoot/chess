@@ -1,17 +1,36 @@
 package service;
 
+import dataaccess.DataAccessException;
+import dataaccess.UserDAO;
+import model.AuthData;
 import model.Requests.LoginRequest;
 import model.Requests.LogoutRequest;
 import model.Requests.RegisterRequest;
 import model.Results.LoginResult;
 import model.Results.RegisterResult;
+import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
-    public RegisterResult register(RegisterRequest registerRequest) {
-        return new RegisterResult("Temp", "Temp");
+    UserDAO userDao = new UserDAO();
+    public RegisterResult register(AuthService service, RegisterRequest registerRequest) throws DataAccessException {
+        String hashedPassword = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
+        userDao.crateUser(registerRequest.username(), hashedPassword, registerRequest.email());
+        AuthData authData = service.createSession(registerRequest.username());
+        return new RegisterResult(authData.username(), authData.authToken());
     }
-    public LoginResult login(LoginRequest loginRequest) {
-        return new LoginResult("Temp", "Temp");
+    public LoginResult login(AuthService service, LoginRequest loginRequest) throws DataAccessException {
+        UserData userData = userDao.getUser(loginRequest.username());
+        if (BCrypt.checkpw(loginRequest.password(), userData.password())) {
+            throw new DataAccessException("Invalid Password");
+        }
+        AuthData authData = service.createSession(userData.username());
+        return new LoginResult(authData.username(), authData.authToken());
     }
-    public void logout(LogoutRequest logoutRequest) {}
+    public void logout(AuthService service, LogoutRequest logoutRequest) throws DataAccessException {
+        service.deleteSession(logoutRequest.authToken());
+    }
+    public void clearDb() {
+        userDao.clearDb();
+    }
 }
