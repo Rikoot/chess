@@ -5,8 +5,8 @@ import model.AuthData;
 
 public class AuthService {
     AuthDAO authDao = new AuthDAO();
-    public boolean validateSession(String authToken) {
-        return authDao.getAuth(authToken) != null;
+    public AuthData validateSession(String authToken) {
+        return authDao.getAuth(authToken);
     }
     public AuthData createSession(String username) throws DataAccessException {
         AuthData authData = new AuthData(AuthData.generateToken(), username);

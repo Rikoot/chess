@@ -51,7 +51,7 @@ public class Server {
     }
 
     private void checkAuthToken(Context ctx) {
-        if (!authService.validateSession(ctx.header("authorization"))) {
+        if (authService.validateSession(ctx.header("authorization")) == null) {
             ErrorData errorData = new ErrorData("Error: unauthorized");
             ctx.status(401).json(errorData);
         }
