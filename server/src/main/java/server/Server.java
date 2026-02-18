@@ -1,5 +1,7 @@
 package server;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import dataaccess.DataAccessException;
 import io.javalin.*;
 import io.javalin.http.Context;
@@ -21,6 +23,7 @@ public class Server {
     UserService userService = new UserService();
     AuthService authService = new AuthService();
     GameService gameService = new GameService();
+    Gson serializer = new Gson();
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -39,6 +42,11 @@ public class Server {
         javalin.put("/game", this::handleJoinGame);
         // DELETE /db Clear DB
         javalin.delete("/db", this::handleClearDb);
+        // Error handler
+        javalin.exception(RuntimeException.class, (e,ctx) -> {
+            ErrorData errorData = new ErrorData("Error: Internal Error");
+            ctx.status(500).json(serializer.toJson(errorData));
+        });
     }
 
     public int run(int desiredPort) {
@@ -50,102 +58,110 @@ public class Server {
         javalin.stop();
     }
 
-    private void checkAuthToken(Context ctx) {
+    private boolean checkAuthToken(Context ctx) {
         if (authService.validateSession(ctx.header("authorization")) == null) {
             ErrorData errorData = new ErrorData("Error: unauthorized");
-            ctx.status(401).json(errorData);
+            ctx.status(401).json(serializer.toJson(errorData));
+            return true;
         }
+        return false;
     }
     private void handleRegister(Context ctx) {
-        RegisterRequest registerRequest = null;
-        try {
-            registerRequest = ctx.bodyAsClass(RegisterRequest.class);
-        } catch (HttpResponseException httpResponseException) {
+        RegisterRequest registerRequest = serializer.fromJson(ctx.body(), RegisterRequest.class);
+        if (registerRequest.username() == null
+                || registerRequest.password() == null
+                || registerRequest.email() == null) {
             ErrorData errorData = new ErrorData("Error: bad request");
-            ctx.status(400).json(errorData);
+            ctx.status(400).json(serializer.toJson(errorData));
             return;
         }
         RegisterResult registerResult = null;
         try {
            registerResult = userService.register(authService, registerRequest);
+           ctx.status(200).json(serializer.toJson(registerResult));
         } catch (DataAccessException dataAccessException) {
             ErrorData errorData = new ErrorData("Error Already Taken");
-            ctx.status(403).json(errorData);
+            ctx.status(403).json(serializer.toJson(errorData));
         }
     }
     private void handleLogin(Context ctx) {
-        LoginRequest loginRequest = null;
-        try {
-            loginRequest = ctx.bodyAsClass(LoginRequest.class);
-        } catch (HttpResponseException httpResponseException) {
+        LoginRequest loginRequest = serializer.fromJson(ctx.body(), LoginRequest.class);
+        if (loginRequest.username() == null
+                || loginRequest.password() == null) {
             ErrorData errorData = new ErrorData("Error: bad request");
-            ctx.status(400).json(errorData);
+            ctx.status(400).json(serializer.toJson(errorData));
             return;
         }
         LoginResult loginResult = null;
         try {
             loginResult = userService.login(authService, loginRequest);
+            ctx.status(200).json(serializer.toJson(loginResult));
         } catch (DataAccessException dataAccessException) {
             ErrorData errorData = new ErrorData("Wrong Username or Password");
-            ctx.status(401).json(errorData);
+            ctx.status(401).json(serializer.toJson(errorData));
         }
     }
     private void handleLogout(Context ctx) {
-        LogoutRequest logoutRequest = null;
-        try {
-            logoutRequest = ctx.bodyAsClass(LogoutRequest.class);
-        } catch (HttpResponseException httpResponseException) {
+        LogoutRequest logoutRequest = new LogoutRequest(ctx.header("authorization"));
+        if (logoutRequest.authToken() == null) {
             ErrorData errorData = new ErrorData("Error: bad request");
-            ctx.status(400).json(errorData);
+            ctx.status(400).json(serializer.toJson(errorData));
             return;
         }
-        checkAuthToken(ctx);
+        if (checkAuthToken(ctx)) {
+            return;
+        }
         try {
             userService.logout(authService, logoutRequest);
+            ctx.status(200);
         } catch (DataAccessException dataAccessException) {
-
+            ErrorData errorData = new ErrorData("Error: Unknown");
+            ctx.status(401).json(serializer.toJson(errorData));
         }
 
     }
     private void handleListGame(Context ctx) {
         ListRequest listRequest = null;
         try {
-            listRequest = ctx.bodyAsClass(ListRequest.class);
-        } catch (HttpResponseException httpResponseException) {
+            listRequest = serializer.fromJson(ctx.body(), ListRequest.class);
+        } catch (JsonParseException jsonParseException) {
             ErrorData errorData = new ErrorData("Error: bad request");
-            ctx.status(400).json(errorData);
+            ctx.status(400).json(serializer.toJson(errorData));
             return;
         }
-        checkAuthToken(ctx);
+        if (checkAuthToken(ctx)) {
+            return;
+        }
         ListResult listResult = gameService.listGames(authService, listRequest);
     }
     private void handleCreateGame(Context ctx) {
-        CreateRequest createRequest = null;
-        try {
-            createRequest = ctx.bodyAsClass(CreateRequest.class);
-        } catch (HttpResponseException httpResponseException) {
+        CreateRequest createRequest = serializer.fromJson(ctx.body(), CreateRequest.class);
+        if (createRequest.gameName() == null) {
             ErrorData errorData = new ErrorData("Error: bad request");
-            ctx.status(400).json(errorData);
+            ctx.status(400).json(serializer.toJson(errorData));
             return;
         }
-        checkAuthToken(ctx);
+        if (checkAuthToken(ctx)) {
+            return;
+        }
         CreateResult createResult = gameService.createGame(createRequest);
     }
     private void handleJoinGame(Context ctx) {
-        JoinRequest joinRequest = null;
-        try {
-            joinRequest = ctx.bodyAsClass(JoinRequest.class);
-        } catch (HttpResponseException httpResponseException) {
+        JoinRequest joinRequest = serializer.fromJson(ctx.body(), JoinRequest.class);
+        if (joinRequest.gameID() == null
+                || joinRequest.playerColor() == null) {
             ErrorData errorData = new ErrorData("Error: bad request");
-            ctx.status(400).json(errorData);
+            ctx.status(400).json(serializer.toJson(errorData));
             return;
         }
-        checkAuthToken(ctx);
+        if (checkAuthToken(ctx)) {
+            return;
+        }
         try {
             gameService.joinGame(authService, joinRequest);
         } catch (DataAccessException dataAccessException) {
             ErrorData errorData = new ErrorData("Error: already taken");
-            ctx.status(403).json(errorData);
+            ctx.status(403).json(serializer.toJson(errorData));
         }
 
     }
