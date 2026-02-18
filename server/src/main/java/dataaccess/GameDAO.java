@@ -15,7 +15,12 @@ public class GameDAO {
     }
     public Collection<GameData> getGames(String username) {
         Collection<GameData> gameData = new HashSet<>();
-
+        for (GameData game : gameDataCollection) {
+            if (game.blackUsername().equals(username)
+                    || game.whiteUsername().equals(username)) {
+                gameData.add(game);
+            }
+        }
         return gameData;
     }
 
@@ -53,6 +58,8 @@ public class GameDAO {
         } else {
             throw  new DataAccessException("playerColor not valid");
         }
-
+    }
+    public void clearDb() {
+        gameDataCollection = new HashSet<>();
     }
 }

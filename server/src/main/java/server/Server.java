@@ -57,15 +57,15 @@ public class Server {
         }
     }
     private void handleRegister(Context ctx) {
+        RegisterRequest registerRequest = null;
         try {
-
+            registerRequest = ctx.bodyAsClass(RegisterRequest.class);
         } catch (HttpResponseException httpResponseException) {
             ErrorData errorData = new ErrorData("Error: bad request");
             ctx.status(400).json(errorData);
             return;
         }
-        RegisterRequest registerRequest = ctx.bodyAsClass(RegisterRequest.class);
-        RegisterResult registerResult;
+        RegisterResult registerResult = null;
         try {
            registerResult = userService.register(authService, registerRequest);
         } catch (DataAccessException dataAccessException) {
@@ -97,6 +97,7 @@ public class Server {
         } catch (HttpResponseException httpResponseException) {
             ErrorData errorData = new ErrorData("Error: bad request");
             ctx.status(400).json(errorData);
+            return;
         }
         checkAuthToken(ctx);
         try {
@@ -113,9 +114,10 @@ public class Server {
         } catch (HttpResponseException httpResponseException) {
             ErrorData errorData = new ErrorData("Error: bad request");
             ctx.status(400).json(errorData);
+            return;
         }
         checkAuthToken(ctx);
-        ListResult listResult = gameService.listGames(listRequest);
+        ListResult listResult = gameService.listGames(authService, listRequest);
     }
     private void handleCreateGame(Context ctx) {
         CreateRequest createRequest = null;
@@ -124,6 +126,7 @@ public class Server {
         } catch (HttpResponseException httpResponseException) {
             ErrorData errorData = new ErrorData("Error: bad request");
             ctx.status(400).json(errorData);
+            return;
         }
         checkAuthToken(ctx);
         CreateResult createResult = gameService.createGame(createRequest);
@@ -135,12 +138,20 @@ public class Server {
         } catch (HttpResponseException httpResponseException) {
             ErrorData errorData = new ErrorData("Error: bad request");
             ctx.status(400).json(errorData);
+            return;
         }
         checkAuthToken(ctx);
-        gameService.joinGame(joinRequest);
+        try {
+            gameService.joinGame(authService, joinRequest);
+        } catch (DataAccessException dataAccessException) {
+            ErrorData errorData = new ErrorData("Error: already taken");
+            ctx.status(403).json(errorData);
+        }
+
     }
     private void handleClearDb(Context ctx) {
         authService.clearDb();
         userService.clearDb();
+        gameService.clearDb();
     }
 }

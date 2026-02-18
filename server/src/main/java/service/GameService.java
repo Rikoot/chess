@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
+import model.AuthData;
 import model.Requests.CreateRequest;
 import model.Requests.JoinRequest;
 import model.Requests.ListRequest;
@@ -9,24 +10,27 @@ import model.Results.CreateResult;
 import model.Results.ListResult;
 
 public class GameService {
-    GameDAO gameDAO;
+    GameDAO gameDao;
 
     public GameService() {
-        gameDAO = new GameDAO();
+        gameDao = new GameDAO();
     }
     public ListResult listGames(AuthService service, ListRequest listRequest) {
-
-        return new ListResult();
+        AuthData authData = service.validateSession(listRequest.authToken());
+        return new ListResult(gameDao.getGames(authData.username()));
     }
-    public CreateResult createGame(AuthService service, CreateRequest createRequest) {
-        return new CreateResult();
+    public CreateResult createGame(CreateRequest createRequest) {
+        return new CreateResult(gameDao.createGame(createRequest.gameName()));
     }
-    public void joinGame(AuthService service, JoinRequest joinRequest) {
-
+    public void joinGame(AuthService service, JoinRequest joinRequest) throws DataAccessException {
+        AuthData authData = service.validateSession(joinRequest.authToken());
         try {
-            gameDAO.joinGame();
+            gameDao.joinGame(joinRequest.playerColor(), joinRequest.gameID(), authData.username());
         } catch (DataAccessException dataAccessException) {
-
+            throw new DataAccessException(dataAccessException.getMessage());
         }
+    }
+    public void clearDb() {
+        gameDao.clearDb();
     }
 }
