@@ -60,7 +60,7 @@ public class Server {
 
     private boolean checkAuthToken(Context ctx) {
         if (authService.validateSession(ctx.header("authorization")) == null) {
-            ErrorData errorData = new ErrorData("Error: unauthorized");
+            ErrorData errorData = new ErrorData("Error: Unauthorized");
             ctx.status(401).json(serializer.toJson(errorData));
             return true;
         }
@@ -71,7 +71,7 @@ public class Server {
         if (registerRequest.username() == null
                 || registerRequest.password() == null
                 || registerRequest.email() == null) {
-            ErrorData errorData = new ErrorData("Error: bad request");
+            ErrorData errorData = new ErrorData("Error: Bad Request");
             ctx.status(400).json(serializer.toJson(errorData));
             return;
         }
@@ -80,7 +80,7 @@ public class Server {
            registerResult = userService.register(authService, registerRequest);
            ctx.status(200).json(serializer.toJson(registerResult));
         } catch (DataAccessException dataAccessException) {
-            ErrorData errorData = new ErrorData("Error Already Taken");
+            ErrorData errorData = new ErrorData("Error: Already Taken");
             ctx.status(403).json(serializer.toJson(errorData));
         }
     }
@@ -88,7 +88,7 @@ public class Server {
         LoginRequest loginRequest = serializer.fromJson(ctx.body(), LoginRequest.class);
         if (loginRequest.username() == null
                 || loginRequest.password() == null) {
-            ErrorData errorData = new ErrorData("Error: bad request");
+            ErrorData errorData = new ErrorData("Error: Bad Request");
             ctx.status(400).json(serializer.toJson(errorData));
             return;
         }
@@ -97,14 +97,14 @@ public class Server {
             loginResult = userService.login(authService, loginRequest);
             ctx.status(200).json(serializer.toJson(loginResult));
         } catch (DataAccessException dataAccessException) {
-            ErrorData errorData = new ErrorData("Wrong Username or Password");
+            ErrorData errorData = new ErrorData("Error: Wrong Username or Password");
             ctx.status(401).json(serializer.toJson(errorData));
         }
     }
     private void handleLogout(Context ctx) {
         LogoutRequest logoutRequest = new LogoutRequest(ctx.header("authorization"));
         if (logoutRequest.authToken() == null) {
-            ErrorData errorData = new ErrorData("Error: bad request");
+            ErrorData errorData = new ErrorData("Error: Bad Request");
             ctx.status(400).json(serializer.toJson(errorData));
             return;
         }
@@ -125,7 +125,7 @@ public class Server {
         try {
             listRequest = serializer.fromJson(ctx.body(), ListRequest.class);
         } catch (JsonParseException jsonParseException) {
-            ErrorData errorData = new ErrorData("Error: bad request");
+            ErrorData errorData = new ErrorData("Error: Bad Request");
             ctx.status(400).json(serializer.toJson(errorData));
             return;
         }
@@ -137,7 +137,7 @@ public class Server {
     private void handleCreateGame(Context ctx) {
         CreateRequest createRequest = serializer.fromJson(ctx.body(), CreateRequest.class);
         if (createRequest.gameName() == null) {
-            ErrorData errorData = new ErrorData("Error: bad request");
+            ErrorData errorData = new ErrorData("Error: Bad Request");
             ctx.status(400).json(serializer.toJson(errorData));
             return;
         }
@@ -150,7 +150,7 @@ public class Server {
         JoinRequest joinRequest = serializer.fromJson(ctx.body(), JoinRequest.class);
         if (joinRequest.gameID() == null
                 || joinRequest.playerColor() == null) {
-            ErrorData errorData = new ErrorData("Error: bad request");
+            ErrorData errorData = new ErrorData("Error: Bad Request");
             ctx.status(400).json(serializer.toJson(errorData));
             return;
         }
@@ -160,7 +160,7 @@ public class Server {
         try {
             gameService.joinGame(authService, joinRequest);
         } catch (DataAccessException dataAccessException) {
-            ErrorData errorData = new ErrorData("Error: already taken");
+            ErrorData errorData = new ErrorData("Error: Already Taken");
             ctx.status(403).json(serializer.toJson(errorData));
         }
 

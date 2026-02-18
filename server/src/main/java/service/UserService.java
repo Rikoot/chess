@@ -21,7 +21,10 @@ public class UserService {
     }
     public LoginResult login(AuthService service, LoginRequest loginRequest) throws DataAccessException {
         UserData userData = userDao.getUser(loginRequest.username());
-        if (BCrypt.checkpw(loginRequest.password(), userData.password())) {
+        if (userData == null) {
+            throw new DataAccessException("Invalid User");
+        }
+        if (!BCrypt.checkpw(loginRequest.password(), userData.password())) {
             throw new DataAccessException("Invalid Password");
         }
         AuthData authData = service.createSession(userData.username());
