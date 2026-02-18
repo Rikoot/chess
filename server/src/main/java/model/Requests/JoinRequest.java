@@ -3,6 +3,9 @@ package model.Requests;
 import chess.ChessGame;
 
 public record JoinRequest(String playerColor,
-                          String gameID,
+                          int gameID,
                           String authToken) {
+    public JoinRequest addAuthToken(String newAuthToken) {
+        return new JoinRequest(playerColor, gameID, newAuthToken);
+    }
 }

@@ -15,9 +15,8 @@ public class GameService {
     public GameService() {
         gameDao = new GameDAO();
     }
-    public ListResult listGames(AuthService service, ListRequest listRequest) {
-        AuthData authData = service.validateSession(listRequest.authToken());
-        return new ListResult(gameDao.getGames(authData.username()));
+    public ListResult listGames(ListRequest listRequest) {
+        return new ListResult(gameDao.getGames());
     }
     public CreateResult createGame(CreateRequest createRequest) {
         return new CreateResult(gameDao.createGame(createRequest.gameName()));

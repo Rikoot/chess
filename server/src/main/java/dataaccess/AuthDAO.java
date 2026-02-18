@@ -31,7 +31,7 @@ public class AuthDAO {
     }
     public void createAuth(AuthData data) throws DataAccessException {
         if (authDataCollection.contains(data)) {
-            throw new DataAccessException("Token doesn't exist.");
+            throw new DataAccessException("Token already exists.");
         } else {
             authDataCollection.add(data);
         }

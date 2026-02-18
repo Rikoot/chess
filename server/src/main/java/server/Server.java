@@ -17,6 +17,8 @@ import service.AuthService;
 import service.GameService;
 import service.UserService;
 
+import java.util.Objects;
+
 public class Server {
 
     private final Javalin javalin;
@@ -37,7 +39,7 @@ public class Server {
         // GET /game List Games
         javalin.get("/game", this::handleListGame);
         // POST /game Create Game
-        javalin.post("/post", this::handleCreateGame);
+        javalin.post("/game", this::handleCreateGame);
         // PUT /game Join Game
         javalin.put("/game", this::handleJoinGame);
         // DELETE /db Clear DB
@@ -121,10 +123,8 @@ public class Server {
 
     }
     private void handleListGame(Context ctx) {
-        ListRequest listRequest = null;
-        try {
-            listRequest = serializer.fromJson(ctx.body(), ListRequest.class);
-        } catch (JsonParseException jsonParseException) {
+        ListRequest listRequest = new ListRequest(ctx.header("authorization"));
+        if (listRequest.authToken() == null) {
             ErrorData errorData = new ErrorData("Error: Bad Request");
             ctx.status(400).json(serializer.toJson(errorData));
             return;
@@ -132,7 +132,9 @@ public class Server {
         if (checkAuthToken(ctx)) {
             return;
         }
-        ListResult listResult = gameService.listGames(authService, listRequest);
+        ListResult listResult = gameService.listGames(listRequest);
+        ctx.status(200).json(serializer.toJson(listResult));
+
     }
     private void handleCreateGame(Context ctx) {
         CreateRequest createRequest = serializer.fromJson(ctx.body(), CreateRequest.class);
@@ -145,22 +147,25 @@ public class Server {
             return;
         }
         CreateResult createResult = gameService.createGame(createRequest);
+        ctx.status(200).json(serializer.toJson(createResult));
     }
     private void handleJoinGame(Context ctx) {
+        if (checkAuthToken(ctx)) {
+            return;
+        }
         JoinRequest joinRequest = serializer.fromJson(ctx.body(), JoinRequest.class);
-        if (joinRequest.gameID() == null
-                || joinRequest.playerColor() == null) {
+        if ((joinRequest.gameID() == 0) || (joinRequest.playerColor() == null) || ((!Objects.equals(joinRequest.playerColor(), "WHITE"))
+                && !Objects.equals(joinRequest.playerColor(), "BLACK"))) {
             ErrorData errorData = new ErrorData("Error: Bad Request");
             ctx.status(400).json(serializer.toJson(errorData));
             return;
         }
-        if (checkAuthToken(ctx)) {
-            return;
-        }
+        joinRequest = joinRequest.addAuthToken(ctx.header("authorization"));
         try {
             gameService.joinGame(authService, joinRequest);
+            ctx.status(200);
         } catch (DataAccessException dataAccessException) {
-            ErrorData errorData = new ErrorData("Error: Already Taken");
+            ErrorData errorData = new ErrorData(dataAccessException.getMessage());
             ctx.status(403).json(serializer.toJson(errorData));
         }
 
