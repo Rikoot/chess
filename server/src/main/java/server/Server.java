@@ -1,18 +1,15 @@
 package server;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 import dataaccess.DataAccessException;
 import io.javalin.*;
 import io.javalin.http.Context;
-import io.javalin.http.HttpResponseException;
 import model.ErrorData;
-import model.Requests.*;
-import model.Results.CreateResult;
-import model.Results.ListResult;
-import model.Results.LoginResult;
-import model.Results.RegisterResult;
-import model.UserData;
+import model.requests.*;
+import model.results.CreateResult;
+import model.results.ListResult;
+import model.results.LoginResult;
+import model.results.RegisterResult;
 import service.AuthService;
 import service.GameService;
 import service.UserService;

@@ -3,11 +3,11 @@ package service;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import model.AuthData;
-import model.Requests.CreateRequest;
-import model.Requests.JoinRequest;
-import model.Requests.ListRequest;
-import model.Results.CreateResult;
-import model.Results.ListResult;
+import model.requests.CreateRequest;
+import model.requests.JoinRequest;
+import model.requests.ListRequest;
+import model.results.CreateResult;
+import model.results.ListResult;
 
 public class GameService {
     GameDAO gameDao;

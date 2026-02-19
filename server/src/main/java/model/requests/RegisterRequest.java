@@ -1,4 +1,4 @@
-package model.Requests;
+package model.requests;
 
 public record RegisterRequest(String username,
                               String password,

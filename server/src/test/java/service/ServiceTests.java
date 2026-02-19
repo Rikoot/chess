@@ -2,11 +2,10 @@ package service;
 
 import dataaccess.DataAccessException;
 import model.AuthData;
-import model.Requests.*;
-import model.Results.CreateResult;
-import model.Results.ListResult;
-import model.Results.LoginResult;
-import model.Results.RegisterResult;
+import model.requests.*;
+import model.results.CreateResult;
+import model.results.ListResult;
+import model.results.LoginResult;
 import org.junit.jupiter.api.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
