@@ -1,10 +1,10 @@
 package service;
-import dataaccess.AuthDAO;
+import dataaccess.AuthSQLDAO;
 import dataaccess.DataAccessException;
 import model.AuthData;
 
 public class AuthService {
-    AuthDAO authDao = new AuthDAO();
+    AuthSQLDAO authDao = new AuthSQLDAO();
     public AuthData validateSession(String authToken) {
         return authDao.getAuth(authToken);
     }

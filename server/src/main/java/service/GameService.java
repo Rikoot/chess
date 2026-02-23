@@ -1,7 +1,7 @@
 package service;
 
 import dataaccess.DataAccessException;
-import dataaccess.GameDAO;
+import dataaccess.GameSQLDAO;
 import model.AuthData;
 import model.requests.CreateRequest;
 import model.requests.JoinRequest;
@@ -10,10 +10,10 @@ import model.results.CreateResult;
 import model.results.ListResult;
 
 public class GameService {
-    GameDAO gameDao;
+    GameSQLDAO gameDao;
 
     public GameService() {
-        gameDao = new GameDAO();
+        gameDao = new GameSQLDAO();
     }
     public ListResult listGames(ListRequest listRequest) {
         return new ListResult(gameDao.getGames());

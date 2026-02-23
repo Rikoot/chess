@@ -1,7 +1,7 @@
 package service;
 
 import dataaccess.DataAccessException;
-import dataaccess.UserDAO;
+import dataaccess.UserSQLDAO;
 import model.AuthData;
 import model.requests.LoginRequest;
 import model.requests.LogoutRequest;
@@ -12,10 +12,10 @@ import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
-    UserDAO userDao = new UserDAO();
+    UserSQLDAO userDao = new UserSQLDAO();
     public RegisterResult register(AuthService service, RegisterRequest registerRequest) throws DataAccessException {
         String hashedPassword = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
-        userDao.crateUser(registerRequest.username(), hashedPassword, registerRequest.email());
+        userDao.createUser(registerRequest.username(), hashedPassword, registerRequest.email());
         AuthData authData = service.createSession(registerRequest.username());
         return new RegisterResult(authData.username(), authData.authToken());
     }

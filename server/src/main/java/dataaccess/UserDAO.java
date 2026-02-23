@@ -19,9 +19,9 @@ public class UserDAO {
         }
         return null;
     }
-    public void crateUser(String username,
-                                 String password,
-                                 String email) throws DataAccessException {
+    public void createUser(String username,
+                           String password,
+                           String email) throws DataAccessException {
         if (getUser(username) == null) {
             UserData userData = new UserData(username, password, email);
             userDataCollection.add(userData);
