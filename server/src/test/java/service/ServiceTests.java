@@ -21,7 +21,6 @@ public class ServiceTests {
 
     @BeforeAll
     public static void init() {
-
         try {
             authService = new AuthService();
             gameService = new GameService();
@@ -126,7 +125,12 @@ public class ServiceTests {
         Assertions.assertDoesNotThrow(() -> {
             gameService.createGame(new CreateRequest(testGameName, testAuthToken));
         });
-        ListResult listResult = gameService.listGames(new ListRequest(testAuthToken));
+        ListResult listResult = null;
+        try {
+            listResult = gameService.listGames(new ListRequest(testAuthToken));
+        } catch (DataAccessException e) {
+            Assertions.assertNull(e);
+        }
         Assertions.assertNotNull(listResult,
                 "No Games were returned");
     }
@@ -172,26 +176,26 @@ public class ServiceTests {
     @Order(9)
     @DisplayName("joinGame - Join Game with Color Taken")
     public void joinGameNameFailure() {
-        AuthData createdAuthData;
+        AuthData authData;
         try {
-            createdAuthData = authService.createSession(testUser);
+            authData = authService.createSession(testUser);
         } catch (DataAccessException e) {
             return;
         }
-        CreateResult createResult = null;
+        CreateResult createdResult = null;
         try {
-            createResult = gameService.createGame(new CreateRequest(testGameName, testAuthToken));
+            createdResult = gameService.createGame(new CreateRequest(testGameName, testAuthToken));
         } catch (DataAccessException dataAccessException) {
             Assertions.assertNull(dataAccessException);
         }
-        CreateResult finalCreateResult = createResult;
+        CreateResult finalCreateResult = createdResult;
         Assertions.assertDoesNotThrow(
                 () -> {gameService.joinGame(authService,
-                        new JoinRequest("BLACK", finalCreateResult.gameID(), createdAuthData.authToken()));},
+                        new JoinRequest("BLACK", finalCreateResult.gameID(), authData.authToken()));},
                 "Error joining thrown");
         Assertions.assertThrows(DataAccessException.class,
                 () -> {gameService.joinGame(authService,
-                        new JoinRequest("BLACK", finalCreateResult.gameID(), createdAuthData.authToken()));},
+                        new JoinRequest("BLACK", finalCreateResult.gameID(), authData.authToken()));},
                 "Error joining wasn't thrown");
     }
 
@@ -259,7 +263,7 @@ public class ServiceTests {
     }
 
     @Test
-    @Order(13)
+    @Order(15)
     @DisplayName("logout - Valid Session")
     public void logoutSuccess() {
         Assertions.assertDoesNotThrow(() -> {
@@ -278,7 +282,7 @@ public class ServiceTests {
     }
 
     @Test
-    @Order(14)
+    @Order(16)
     @DisplayName("logout - Invalid Session")
     public void logoutFailure() {
         Assertions.assertThrows(DataAccessException.class, () ->

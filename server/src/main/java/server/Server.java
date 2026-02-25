@@ -136,7 +136,14 @@ public class Server {
         if (checkAuthToken(ctx)) {
             return;
         }
-        ListResult listResult = gameService.listGames(listRequest);
+        ListResult listResult = null;
+        try {
+            listResult = gameService.listGames(listRequest);
+        } catch (DataAccessException e) {
+            ErrorData errorData = new ErrorData("Error: Internal Error");
+            ctx.status(500).json(serializer.toJson(errorData));
+        }
+
         ctx.status(200).json(serializer.toJson(listResult));
 
     }

@@ -1,12 +1,15 @@
 package dataaccess;
 
 import model.AuthData;
+import model.GameData;
 import model.requests.CreateRequest;
 import model.results.CreateResult;
 import org.junit.jupiter.api.*;
 import service.AuthService;
 import service.GameService;
 import service.UserService;
+
+import java.util.Collection;
 
 public class DAOTests {
     private static AuthSQLDAO authSQLDAO;
@@ -19,8 +22,7 @@ public class DAOTests {
     private static String testGameName;
 
     @BeforeAll
-    public static void init() {
-
+    public static void start() {
         try {
             authSQLDAO = new AuthSQLDAO();
             gameSQLDAO = new GameSQLDAO();
@@ -82,6 +84,16 @@ public class DAOTests {
 
     @Test
     @Order(4)
+    @DisplayName("createAuth - Invalid Session")
+    public void createAuthFailure() {
+        AuthData createdAuthData = new AuthData(null, null);
+        Assertions.assertThrows(DataAccessException.class, () -> {
+           authSQLDAO.createAuth(createdAuthData);
+        });
+    }
+
+    @Test
+    @Order(5)
     @DisplayName("deleteAuth - Valid Session")
     public void deleteAuthSuccess() {
         AuthData createdAuthData = new AuthData(testAuthToken, testUser);
@@ -96,7 +108,7 @@ public class DAOTests {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     @DisplayName("deleteAuth - Invalid Session")
     public void deleteAuthFailure() {
         Assertions.assertThrows(DataAccessException.class,
@@ -106,7 +118,7 @@ public class DAOTests {
 
     // Game DAO Tests
     @Test
-    @Order(6)
+    @Order(7)
     @DisplayName("getGames - One Game")
     public void getGamesSuccess() {
         try {
@@ -114,7 +126,13 @@ public class DAOTests {
         } catch (DataAccessException e) {
             Assertions.assertNull(e, "Create Game threw an Error");
         }
-        Assertions.assertNotNull(gameSQLDAO.getGames());
+        Collection<GameData> gameData = null;
+        try {
+            gameData = gameSQLDAO.getGames();
+        } catch (DataAccessException e) {
+            Assertions.assertNotNull(e, "Get Games threw an error");
+        }
+        Assertions.assertNotNull(gameData);
     }
     @Test
     @Order(7)

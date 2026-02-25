@@ -63,7 +63,7 @@ public class AuthSQLDAO {
             preparedStatement.setString(2, data.authToken());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException("Error: Internal Error");
         }
     }
     public void clearDb() throws DataAccessException {

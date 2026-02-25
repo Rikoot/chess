@@ -15,7 +15,7 @@ public class GameService {
     public GameService() throws DataAccessException {
         gameDao = new GameSQLDAO();
     }
-    public ListResult listGames(ListRequest listRequest) {
+    public ListResult listGames(ListRequest listRequest) throws DataAccessException {
         return new ListResult(gameDao.getGames());
     }
     public CreateResult createGame(CreateRequest createRequest) throws DataAccessException{

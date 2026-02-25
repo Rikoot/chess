@@ -25,7 +25,7 @@ public class GameSQLDAO {
         gameIDCount = 1;
         this.createDb();
     }
-    public Collection<GameData> getGames() {
+    public Collection<GameData> getGames() throws DataAccessException{
         Connection conn = null;
         try {
             conn = DatabaseManager.getConnection();
@@ -45,7 +45,7 @@ public class GameSQLDAO {
                         serializer.fromJson(resultSet.getString("game"), ChessGame.class)));
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException("Error: Internal Error");
         }
         return gameDataCollection;
     }
