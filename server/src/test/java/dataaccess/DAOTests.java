@@ -2,12 +2,7 @@ package dataaccess;
 
 import model.AuthData;
 import model.GameData;
-import model.requests.CreateRequest;
-import model.results.CreateResult;
 import org.junit.jupiter.api.*;
-import service.AuthService;
-import service.GameService;
-import service.UserService;
 
 import java.util.Collection;
 
@@ -135,7 +130,7 @@ public class DAOTests {
         Assertions.assertNotNull(gameData);
     }
     @Test
-    @Order(7)
+    @Order(8)
     @DisplayName("createGame - New Game")
     public void createGameSuccess() {
         int gameID = 0;
@@ -149,7 +144,7 @@ public class DAOTests {
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     @DisplayName("joinGame - Join Valid Game")
     public void joinGameSuccess() {
         AuthData createdAuthData = new AuthData(testAuthToken, testUser);
@@ -167,7 +162,7 @@ public class DAOTests {
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     @DisplayName("joinGame - Join Game with Color Taken")
     public void joinGameNameFailure() {
         AuthData createdAuthData = new AuthData(testAuthToken, testUser);
@@ -188,7 +183,7 @@ public class DAOTests {
     }
 
     @Test
-    @Order(10)
+    @Order(11)
     @DisplayName("joinGame - Join Invalid Game")
     public void joinGameIDFailure() {
         Assertions.assertThrows(DataAccessException.class, () ->
@@ -198,7 +193,7 @@ public class DAOTests {
 
     // User Service Tests
     @Test
-    @Order(11)
+    @Order(12)
     @DisplayName("createUser - New User")
     public void createUserSuccess() {
         Assertions.assertDoesNotThrow(() -> {
@@ -207,7 +202,7 @@ public class DAOTests {
     }
 
     @Test
-    @Order(12)
+    @Order(13)
     @DisplayName("createUser - Existing User")
     public void createUserFailure() {
         Assertions.assertDoesNotThrow(() -> {
@@ -218,7 +213,7 @@ public class DAOTests {
         }, "User was incorrectly created");
     }
     @Test
-    @Order(13)
+    @Order(14)
     @DisplayName("getUser - Valid User Returned")
     public void getUserSuccess() {
         Assertions.assertDoesNotThrow(() -> {
@@ -230,19 +225,30 @@ public class DAOTests {
     }
 
     @Test
-    @Order(14)
+    @Order(15)
     @DisplayName("getUser - Valid User not returned")
     public void getUserFailure() {
         Assertions.assertNull(userSQLDAO.getUser(testUser));
     }
 
-    // Clear DB test
+    // Clear DB tests
     @Test
-    @Order(15)
-    @DisplayName("ClearDB Test")
-    public void clearDbSuccess() {
+    @Order(16)
+    @DisplayName("Auth ClearDB Test")
+    public void clearAuthDbSuccess() {
         Assertions.assertDoesNotThrow(() -> {authSQLDAO.clearDb();});
+    }
+
+    @Test
+    @Order(17)
+    @DisplayName("Game ClearDB Test")
+    public void clearGameDbSuccess() {
         Assertions.assertDoesNotThrow(() -> {gameSQLDAO.clearDb();});
+    }
+    @Test
+    @Order(18)
+    @DisplayName("User ClearDB Test")
+    public void clearUserDbSuccess() {
         Assertions.assertDoesNotThrow(() -> {userSQLDAO.clearDb();});
     }
 }
