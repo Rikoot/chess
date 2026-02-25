@@ -9,12 +9,8 @@ import java.sql.SQLException;
 
 public class AuthSQLDAO {
 
-    public AuthSQLDAO() {
-        try  {
+    public AuthSQLDAO() throws DataAccessException {
             DatabaseManager.createDatabase();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
         this.createDb();
     }
 
@@ -47,11 +43,11 @@ public class AuthSQLDAO {
         if (data == null) {
             throw new DataAccessException("Invalid Session");
         }
-        String statement = "DELETE FROM Auth WHERE Username = ?;";
+        String statement = "DELETE FROM Auth WHERE Authtoken = ?;";
         Connection conn = DatabaseManager.getConnection();
         try {
             PreparedStatement preparedStatement = conn.prepareStatement(statement);
-            preparedStatement.setString(1, data.username());
+            preparedStatement.setString(1, data.authToken());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -70,7 +66,7 @@ public class AuthSQLDAO {
             throw new RuntimeException(e);
         }
     }
-    public void clearDb() {
+    public void clearDb() throws DataAccessException {
         String statement = "DROP TABLE IF EXISTS Auth;";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(statement)) {
@@ -82,7 +78,7 @@ public class AuthSQLDAO {
         }
         createDb();
     }
-    private void createDb() {
+    private void createDb() throws DataAccessException {
         String statement = """
 CREATE TABLE IF NOT EXISTS Auth (
     Username VARCHAR(255) NOT NULL,
@@ -93,10 +89,8 @@ CREATE TABLE IF NOT EXISTS Auth (
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.executeUpdate();
-        } catch (DataAccessException e) {
-
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException("Error: Internal Error");
         }
     }
 }

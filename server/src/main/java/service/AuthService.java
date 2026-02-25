@@ -3,8 +3,13 @@ import dataaccess.AuthSQLDAO;
 import dataaccess.DataAccessException;
 import model.AuthData;
 
+import javax.xml.crypto.Data;
+
 public class AuthService {
-    AuthSQLDAO authDao = new AuthSQLDAO();
+    AuthSQLDAO authDao;
+    public AuthService() throws DataAccessException {
+        authDao = new AuthSQLDAO();
+    }
     public AuthData validateSession(String authToken) {
         return authDao.getAuth(authToken);
     }
@@ -17,7 +22,7 @@ public class AuthService {
         AuthData authData = authDao.getAuth(authToken);
         authDao.deleteAuth(authData);
     }
-    public void clearDb() {
+    public void clearDb() throws DataAccessException {
         authDao.clearDb();
     }
 }

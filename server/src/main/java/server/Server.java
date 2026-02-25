@@ -19,11 +19,18 @@ import java.util.Objects;
 public class Server {
 
     private final Javalin javalin;
-    UserService userService = new UserService();
-    AuthService authService = new AuthService();
-    GameService gameService = new GameService();
+    UserService userService;
+    AuthService authService;
+    GameService gameService;
     Gson serializer = new Gson();
     public Server() {
+        try {
+            userService = new UserService();
+            authService = new AuthService();
+            gameService = new GameService();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
@@ -168,8 +175,15 @@ public class Server {
 
     }
     private void handleClearDb(Context ctx) {
-        authService.clearDb();
-        userService.clearDb();
-        gameService.clearDb();
+        try {
+            authService.clearDb();
+            userService.clearDb();
+            gameService.clearDb();
+        } catch (DataAccessException dataAccessException) {
+            ErrorData errorData = new ErrorData("Error: Internal Error");
+            ctx.status(500).json(serializer.toJson(errorData));
+        }
+
+
     }
 }

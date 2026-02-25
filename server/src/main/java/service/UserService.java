@@ -12,7 +12,11 @@ import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
-    UserSQLDAO userDao = new UserSQLDAO();
+    UserSQLDAO userDao;
+
+    public UserService() throws DataAccessException{
+        userDao = new UserSQLDAO();
+    }
     public RegisterResult register(AuthService service, RegisterRequest registerRequest) throws DataAccessException {
         String hashedPassword = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
         userDao.createUser(registerRequest.username(), hashedPassword, registerRequest.email());
@@ -33,7 +37,7 @@ public class UserService {
     public void logout(AuthService service, LogoutRequest logoutRequest) throws DataAccessException {
         service.deleteSession(logoutRequest.authToken());
     }
-    public void clearDb() {
+    public void clearDb() throws DataAccessException {
         userDao.clearDb();
     }
 }

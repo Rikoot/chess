@@ -10,12 +10,8 @@ import java.sql.SQLException;
 
 public class UserSQLDAO {
 
-    public UserSQLDAO() {
-        try  {
-            DatabaseManager.createDatabase();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+    public UserSQLDAO() throws DataAccessException {
+        DatabaseManager.createDatabase();
         this.createDb();
     }
 
@@ -64,20 +60,18 @@ public class UserSQLDAO {
         }
 
     }
-    public void clearDb() {
+    public void clearDb() throws DataAccessException {
         String statement = "DROP TABLE IF EXISTS Users;";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.executeUpdate();
-        } catch (DataAccessException e) {
-
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException("Error: Internal Error");
         }
         createDb();
     }
 
-    private void createDb() {
+    private void createDb() throws DataAccessException {
         String statement = """
 CREATE TABLE IF NOT EXISTS Users (
     Username VARCHAR(255) NOT NULL,
@@ -89,10 +83,8 @@ CREATE TABLE IF NOT EXISTS Users (
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.executeUpdate();
-        } catch (DataAccessException e) {
-
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException("Error: Internal Error");
         }
     }
 }

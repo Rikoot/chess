@@ -12,7 +12,7 @@ import model.results.ListResult;
 public class GameService {
     GameSQLDAO gameDao;
 
-    public GameService() {
+    public GameService() throws DataAccessException {
         gameDao = new GameSQLDAO();
     }
     public ListResult listGames(ListRequest listRequest) {
@@ -23,13 +23,9 @@ public class GameService {
     }
     public void joinGame(AuthService service, JoinRequest joinRequest) throws DataAccessException {
         AuthData authData = service.validateSession(joinRequest.authToken());
-        try {
-            gameDao.joinGame(joinRequest.playerColor(), joinRequest.gameID(), authData.username());
-        } catch (DataAccessException dataAccessException) {
-            throw new DataAccessException(dataAccessException.getMessage());
-        }
+         gameDao.joinGame(joinRequest.playerColor(), joinRequest.gameID(), authData.username());
     }
-    public void clearDb() {
+    public void clearDb() throws DataAccessException{
         gameDao.clearDb();
     }
 }

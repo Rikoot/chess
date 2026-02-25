@@ -17,13 +17,8 @@ public class GameSQLDAO {
     private int gameIDCount;
     private final Gson serializer;
 
-    public GameSQLDAO() {
-        try  {
-            DatabaseManager.createDatabase();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-
+    public GameSQLDAO() throws DataAccessException {
+        DatabaseManager.createDatabase();
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameDeserializer());
         serializer = gsonBuilder.create();
@@ -128,20 +123,18 @@ public class GameSQLDAO {
         }
     }
 
-    public void clearDb() {
+    public void clearDb() throws DataAccessException {
         gameIDCount = 1;
         String statement = "DROP TABLE IF EXISTS Games;";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.executeUpdate();
-        } catch (DataAccessException e) {
-
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException("Error: Internal Error");
         }
         createDb();
     }
-    private void createDb() {
+    private void createDb() throws DataAccessException {
         String statement = """
 CREATE TABLE IF NOT EXISTS Games (
     gameID INT NOT NULL,
@@ -155,10 +148,8 @@ CREATE TABLE IF NOT EXISTS Games (
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.executeUpdate();
-        } catch (DataAccessException e) {
-
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException("Error: Internal Error");
         }
     }
 }

@@ -21,9 +21,14 @@ public class ServiceTests {
 
     @BeforeAll
     public static void init() {
-        authService = new AuthService();
-        gameService = new GameService();
-        userService = new UserService();
+
+        try {
+            authService = new AuthService();
+            gameService = new GameService();
+            userService = new UserService();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         testUser = "rikoot";
         testPassword = "kwobanmelele";
         testEmail = "rikoot@rikoot.com";
@@ -33,9 +38,13 @@ public class ServiceTests {
 
     @BeforeEach
     public void setup() {
-        authService.clearDb();
-        gameService.clearDb();
-        userService.clearDb();
+        try {
+            authService.clearDb();
+            gameService.clearDb();
+            userService.clearDb();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Auth Service Tests
