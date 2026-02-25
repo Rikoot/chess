@@ -6,7 +6,9 @@ import java.util.Set;
 
 public class ChessGameDeserializer implements JsonDeserializer<ChessGame> {
     @Override
-    public ChessGame deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    public ChessGame deserialize(JsonElement jsonElement,
+                                 Type type,
+                                 JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         ChessGame chessGame = new ChessGame();
         ChessBoard chessBoard = chessGame.getBoard();
