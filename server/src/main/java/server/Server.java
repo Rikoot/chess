@@ -150,7 +150,13 @@ public class Server {
         if (checkAuthToken(ctx)) {
             return;
         }
-        CreateResult createResult = gameService.createGame(createRequest);
+        CreateResult createResult = null;
+        try {
+            createResult = gameService.createGame(createRequest);
+        } catch (DataAccessException e) {
+            ErrorData errorData = new ErrorData("Error: Internal Error");
+            ctx.status(500).json(serializer.toJson(errorData));
+        }
         ctx.status(200).json(serializer.toJson(createResult));
     }
     private void handleJoinGame(Context ctx) {

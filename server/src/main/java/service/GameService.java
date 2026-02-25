@@ -18,7 +18,7 @@ public class GameService {
     public ListResult listGames(ListRequest listRequest) {
         return new ListResult(gameDao.getGames());
     }
-    public CreateResult createGame(CreateRequest createRequest) {
+    public CreateResult createGame(CreateRequest createRequest) throws DataAccessException{
         return new CreateResult(gameDao.createGame(createRequest.gameName()));
     }
     public void joinGame(AuthService service, JoinRequest joinRequest) throws DataAccessException {

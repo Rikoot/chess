@@ -50,16 +50,12 @@ public class GameSQLDAO {
         return gameDataCollection;
     }
 
-    public int createGame(String gameName) {
+    public int createGame(String gameName) throws DataAccessException{
         int gameID = gameIDCount++;
         ChessGame newGame = new ChessGame();
         String statement = "INSERT INTO Games VALUES (?, ?, ?, ?, ?);";
         Connection conn = null;
-        try {
-            conn = DatabaseManager.getConnection();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+        conn = DatabaseManager.getConnection();
         try {
             PreparedStatement preparedStatement = conn.prepareStatement(statement);
             preparedStatement.setInt(1, gameID);
@@ -69,7 +65,7 @@ public class GameSQLDAO {
             preparedStatement.setString(5, serializer.toJson(newGame));
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException("Error: Couldn't create Game");
         }
         return gameID;
     }
