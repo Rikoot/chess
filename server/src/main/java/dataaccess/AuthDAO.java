@@ -1,16 +1,17 @@
 package dataaccess;
 
 import model.AuthData;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 
 public class AuthDAO {
     Collection<AuthData> authDataCollection;
+
     public AuthDAO() {
         authDataCollection = new HashSet<>();
     }
+
     public AuthData getAuth(String searchValue) {
         for (AuthData authData : authDataCollection) {
             if (Objects.equals(authData.username(), searchValue)
@@ -29,6 +30,7 @@ public class AuthDAO {
         }
 
     }
+
     public void createAuth(AuthData data) throws DataAccessException {
         if (authDataCollection.contains(data)) {
             throw new DataAccessException("Token already exists.");
@@ -36,6 +38,7 @@ public class AuthDAO {
             authDataCollection.add(data);
         }
     }
+
     public void clearDb() {
         authDataCollection = new HashSet<>();
     }

@@ -15,16 +15,20 @@ public class GameService {
     public GameService() throws DataAccessException {
         gameDao = new GameSQLDAO();
     }
+
     public ListResult listGames(ListRequest listRequest) throws DataAccessException {
         return new ListResult(gameDao.getGames());
     }
+
     public CreateResult createGame(CreateRequest createRequest) throws DataAccessException{
         return new CreateResult(gameDao.createGame(createRequest.gameName()));
     }
+
     public void joinGame(AuthService service, JoinRequest joinRequest) throws DataAccessException {
         AuthData authData = service.validateSession(joinRequest.authToken());
          gameDao.joinGame(joinRequest.playerColor(), joinRequest.gameID(), authData.username());
     }
+
     public void clearDb() throws DataAccessException{
         gameDao.clearDb();
     }

@@ -25,6 +25,7 @@ public class GameSQLDAO {
         gameIDCount = 1;
         this.createDb();
     }
+
     public Collection<GameData> getGames() throws DataAccessException{
         Connection conn = null;
         try {
@@ -130,6 +131,7 @@ public class GameSQLDAO {
         }
         createDb();
     }
+
     private void createDb() throws DataAccessException {
         String statement = """
 CREATE TABLE IF NOT EXISTS Games (

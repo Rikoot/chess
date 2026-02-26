@@ -1,7 +1,6 @@
 package dataaccess;
 
 import model.AuthData;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -66,6 +65,7 @@ public class AuthSQLDAO {
             throw new DataAccessException("Error: Internal Error");
         }
     }
+
     public void clearDb() throws DataAccessException {
         String statement = "DROP TABLE IF EXISTS Auth;";
         try (Connection conn = DatabaseManager.getConnection();
@@ -78,6 +78,7 @@ public class AuthSQLDAO {
         }
         createDb();
     }
+
     private void createDb() throws DataAccessException {
         String statement = """
 CREATE TABLE IF NOT EXISTS Auth (

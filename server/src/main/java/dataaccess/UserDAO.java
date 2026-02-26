@@ -1,16 +1,17 @@
 package dataaccess;
 
 import model.UserData;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 
 public class UserDAO {
     Collection<UserData> userDataCollection;
+
     public UserDAO() {
         userDataCollection = new HashSet<>();
     }
+
     public UserData getUser(String username) {
         for (UserData userData : userDataCollection) {
             if (Objects.equals(userData.username(), username)) {
@@ -19,6 +20,7 @@ public class UserDAO {
         }
         return null;
     }
+
     public void createUser(String username,
                            String password,
                            String email) throws DataAccessException {
@@ -30,6 +32,7 @@ public class UserDAO {
         }
 
     }
+
     public void clearDb() {
         userDataCollection = new HashSet<>();
     }

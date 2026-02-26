@@ -1,8 +1,6 @@
 package dataaccess;
 
-import model.AuthData;
 import model.UserData;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,6 +37,7 @@ public class UserSQLDAO {
         }
         return data;
     }
+
     public void createUser(String username,
                            String password,
                            String email) throws DataAccessException {
@@ -60,6 +59,7 @@ public class UserSQLDAO {
         }
 
     }
+
     public void clearDb() throws DataAccessException {
         String statement = "DROP TABLE IF EXISTS Users;";
         try (Connection conn = DatabaseManager.getConnection();

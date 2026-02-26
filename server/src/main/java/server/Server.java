@@ -23,6 +23,7 @@ public class Server {
     AuthService authService;
     GameService gameService;
     Gson serializer = new Gson();
+
     public Server() {
         try {
             userService = new UserService();
@@ -72,6 +73,7 @@ public class Server {
         }
         return false;
     }
+
     private void handleRegister(Context ctx) {
         RegisterRequest registerRequest = serializer.fromJson(ctx.body(), RegisterRequest.class);
         if (registerRequest.username() == null
@@ -90,6 +92,7 @@ public class Server {
             ctx.status(403).json(serializer.toJson(errorData));
         }
     }
+
     private void handleLogin(Context ctx) {
         LoginRequest loginRequest = serializer.fromJson(ctx.body(), LoginRequest.class);
         if (loginRequest.username() == null
@@ -107,6 +110,7 @@ public class Server {
             ctx.status(401).json(serializer.toJson(errorData));
         }
     }
+
     private void handleLogout(Context ctx) {
         LogoutRequest logoutRequest = new LogoutRequest(ctx.header("authorization"));
         if (logoutRequest.authToken() == null) {
@@ -126,6 +130,7 @@ public class Server {
         }
 
     }
+
     private void handleListGame(Context ctx) {
         ListRequest listRequest = new ListRequest(ctx.header("authorization"));
         if (listRequest.authToken() == null) {
@@ -147,6 +152,7 @@ public class Server {
         ctx.status(200).json(serializer.toJson(listResult));
 
     }
+
     private void handleCreateGame(Context ctx) {
         CreateRequest createRequest = serializer.fromJson(ctx.body(), CreateRequest.class);
         if (createRequest.gameName() == null) {
@@ -166,6 +172,7 @@ public class Server {
         }
         ctx.status(200).json(serializer.toJson(createResult));
     }
+
     private void handleJoinGame(Context ctx) {
         if (checkAuthToken(ctx)) {
             return;
@@ -187,6 +194,7 @@ public class Server {
         }
 
     }
+
     private void handleClearDb(Context ctx) {
         try {
             authService.clearDb();

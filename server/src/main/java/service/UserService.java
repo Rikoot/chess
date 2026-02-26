@@ -17,12 +17,14 @@ public class UserService {
     public UserService() throws DataAccessException{
         userDao = new UserSQLDAO();
     }
+
     public RegisterResult register(AuthService service, RegisterRequest registerRequest) throws DataAccessException {
         String hashedPassword = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
         userDao.createUser(registerRequest.username(), hashedPassword, registerRequest.email());
         AuthData authData = service.createSession(registerRequest.username());
         return new RegisterResult(authData.username(), authData.authToken());
     }
+
     public LoginResult login(AuthService service, LoginRequest loginRequest) throws DataAccessException {
         UserData userData = userDao.getUser(loginRequest.username());
         if (userData == null) {
@@ -34,9 +36,11 @@ public class UserService {
         AuthData authData = service.createSession(userData.username());
         return new LoginResult(authData.username(), authData.authToken());
     }
+
     public void logout(AuthService service, LogoutRequest logoutRequest) throws DataAccessException {
         service.deleteSession(logoutRequest.authToken());
     }
+
     public void clearDb() throws DataAccessException {
         userDao.clearDb();
     }

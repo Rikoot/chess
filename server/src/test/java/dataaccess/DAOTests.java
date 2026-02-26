@@ -129,6 +129,7 @@ public class DAOTests {
         }
         Assertions.assertNotNull(gameData);
     }
+
     @Test
     @Order(8)
     @DisplayName("createGame - New Game")
@@ -212,6 +213,7 @@ public class DAOTests {
             userSQLDAO.createUser(testUser, testPassword, testEmail);
         }, "User was incorrectly created");
     }
+
     @Test
     @Order(14)
     @DisplayName("getUser - Valid User Returned")
@@ -245,6 +247,7 @@ public class DAOTests {
     public void clearGameDbSuccess() {
         Assertions.assertDoesNotThrow(() -> {gameSQLDAO.clearDb();});
     }
+
     @Test
     @Order(18)
     @DisplayName("User ClearDB Test")
