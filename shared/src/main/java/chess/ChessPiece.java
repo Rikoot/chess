@@ -13,6 +13,7 @@ import java.util.Objects;
 public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final ChessPiece.PieceType type;
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
@@ -111,6 +112,7 @@ public class ChessPiece {
             }
         }
     }
+
     private void kingMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> movesCollection) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
@@ -136,6 +138,7 @@ public class ChessPiece {
             validMove(board, move, myPosition, movesCollection);
         }
     }
+
     private void knightMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> movesCollection) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
@@ -161,6 +164,7 @@ public class ChessPiece {
             validMove(board, move, myPosition, movesCollection);
         }
     }
+
     private void promotionMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> movesCollection) {
         if (pieceColor == ChessGame.TeamColor.BLACK && myPosition.getRow() == 2
                 || pieceColor == ChessGame.TeamColor.WHITE && myPosition.getRow() == 7) {
@@ -172,6 +176,7 @@ public class ChessPiece {
             pawnMoves(board, myPosition, movesCollection, null);
         }
     }
+
     private void pawnMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> movesCollection, ChessPiece.PieceType promotionType) {
         int direction = pieceColor == ChessGame.TeamColor.BLACK ? -1 : 1;
         int row = myPosition.getRow();
@@ -203,10 +208,12 @@ public class ChessPiece {
         }
 
     }
+
     private void queenMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> movesCollection) {
         bishopMoves(board, myPosition, movesCollection);
         rookMoves(board, myPosition, movesCollection);
     }
+
     private void rookMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> movesCollection) {
         // up
         int row = myPosition.getRow();
@@ -239,6 +246,7 @@ public class ChessPiece {
             }
         }
     }
+
     private boolean validMove(ChessBoard board, ChessPosition nextPosition, ChessPosition myPosition, Collection<ChessMove> movesCollection) {
         if (validPosition(nextPosition)) {
             if (piecePresent(board, nextPosition)) {
@@ -257,11 +265,13 @@ public class ChessPiece {
     private boolean piecePresent(ChessBoard board, ChessPosition nextPosition) {
         return board.getPiece(nextPosition) != null;
     }
+
     private boolean validPosition(ChessPosition nextPosition) {
         int row = nextPosition.getRow();
         int col = nextPosition.getColumn();
         return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
+
     private boolean capturablePiece(ChessBoard board, ChessPosition nextPosition) {
         return board.getPiece(nextPosition).getTeamColor() != pieceColor;
     }

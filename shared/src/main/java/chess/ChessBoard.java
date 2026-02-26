@@ -15,6 +15,7 @@ public class ChessBoard {
     public ChessBoard() {
         createBoard();
     }
+
     public ChessBoard deepCopy() {
         ChessBoard copy = new ChessBoard();
         for (Map.Entry<ChessPosition, ChessPiece> object : board.entrySet()) {
@@ -25,6 +26,7 @@ public class ChessBoard {
         }
         return copy;
     }
+
     private void createBoard() {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
@@ -86,6 +88,7 @@ public class ChessBoard {
         // Add black pieces
         setBoardPosition(ChessGame.TeamColor.BLACK);
     }
+
     private void setBoardPosition(ChessGame.TeamColor color) {
         int pawnRow = color == ChessGame.TeamColor.BLACK ? 7 : 2;
         int row = color == ChessGame.TeamColor.BLACK ? 8 : 1;

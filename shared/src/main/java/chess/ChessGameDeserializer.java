@@ -12,7 +12,6 @@ public class ChessGameDeserializer implements JsonDeserializer<ChessGame> {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         ChessGame chessGame = new ChessGame();
         ChessBoard chessBoard = chessGame.getBoard();
-        // iterate through the piece positions and create the copies into the chess board
         JsonObject jsonBoard = jsonObject.get("board").getAsJsonObject().get("board").getAsJsonObject();
         for (String key : jsonBoard.keySet()) {
             addChessPosition(chessBoard, key, jsonBoard.get(key));
@@ -24,6 +23,7 @@ public class ChessGameDeserializer implements JsonDeserializer<ChessGame> {
         }
         return chessGame;
     }
+
     private void addChessPosition(ChessBoard chessBoard, String keyPosition, JsonElement position) {
         JsonObject jsonPiece = position.getAsJsonObject();
         ChessGame.TeamColor pieceColor = null;

@@ -21,11 +21,13 @@ public class ChessRules {
         }
         return actualMoves;
     }
+
     public static void moveMaker(ChessBoard board, ChessPiece movePiece, ChessMove move, ChessGame.TeamColor currentTeam) {
         ChessPiece piece = move.getPromotionPiece() == null ? movePiece : new ChessPiece(currentTeam, move.getPromotionPiece());
         board.addPiece(move.getEndPosition(), piece);
         board.addPiece(move.getStartPosition(), null);
     }
+
     public static void makeMove(ChessBoard board, ChessMove move, ChessGame.TeamColor currentTeam) throws InvalidMoveException {
         ChessPiece movePiece = board.getPiece(move.getStartPosition());
         if (movePiece == null) {
@@ -45,6 +47,7 @@ public class ChessRules {
             throw  new InvalidMoveException("Invalid Move");
         }
     }
+
     public static boolean isInCheck(ChessBoard board, ChessGame.TeamColor teamColor) {
         ChessGame.TeamColor otherTeam = teamColor == ChessGame.TeamColor.BLACK ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
         Collection<ChessMove> moves = calculateMoves(board, otherTeam);
@@ -56,7 +59,6 @@ public class ChessRules {
         }
         return false;
     }
-
 
     public static boolean isInCheckmate(ChessBoard board, ChessGame.TeamColor teamColor) {
         return checkMoves(board, teamColor, true);
@@ -79,6 +81,7 @@ public class ChessRules {
             return false;
         }
     }
+
     public static Collection<ChessMove> calculateMoves(ChessBoard board, ChessGame.TeamColor teamColor) {
         Collection<ChessMove> moves = new HashSet<>();
         Collection<ChessPosition> pieces = findPieces(board, teamColor);
@@ -87,6 +90,7 @@ public class ChessRules {
         }
         return moves;
     }
+
     public static Collection<ChessPosition> findPieces(ChessBoard board, ChessGame.TeamColor teamColor) {
         Collection<ChessPosition> pieces = new HashSet<>();
         for (int col = 1; col <= 8; col++) {
@@ -100,6 +104,7 @@ public class ChessRules {
         }
         return pieces;
     }
+
     public static ChessPosition findKing(ChessBoard board, ChessGame.TeamColor teamColor) {
         for (int col = 1; col <= 8; col++) {
             for (int row = 1; row <= 8; row++) {
