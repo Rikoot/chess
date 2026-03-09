@@ -35,20 +35,4 @@ public class ServerFacade {
     public void logout() {
 
     }
-
-    // generic commands
-    public void quit() {
-
-    }
-
-    public String help() {
-        String helpString = new String();
-        if (true) {
-
-        } else {
-
-        }
-        return helpString;
-    }
-
 }
