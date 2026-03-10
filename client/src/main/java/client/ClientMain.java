@@ -10,7 +10,7 @@ public class ClientMain {
 
     public static void main(String[] args) {
         System.out.println("Welcome to rikoot's chess client.\nType help to get started.");
-        ServerFacade serverFacade = new ServerFacade();
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
         Scanner scanner = new Scanner(System.in);
         boolean loggedIn = false;
         boolean quitStatus = true;
@@ -26,7 +26,9 @@ public class ClientMain {
                 // logged out commands
                 case "register" -> {
                     if (!loggedIn && userArgs.length == 4) {
-                        serverFacade.register();
+                        if (!serverFacade.register(userArgs)) {
+                            httpError();
+                        }
                     } else {
                         error();
                     }
@@ -34,8 +36,12 @@ public class ClientMain {
 
                 case "login" -> {
                     if (!loggedIn && userArgs.length == 3) {
-                        serverFacade.login();
-                        loggedIn = true;
+                        if (serverFacade.login(userArgs)) {
+                            loggedIn = true;
+                        } else {
+                            httpError();
+                        }
+
                     } else {
                         error();
                     }
@@ -43,7 +49,7 @@ public class ClientMain {
                 // logged in commands
                 case "create" -> {
                     if (loggedIn && userArgs.length == 2) {
-                        serverFacade.create();
+                        serverFacade.create(userArgs);
                     } else {
                         error();
                     }
@@ -59,7 +65,7 @@ public class ClientMain {
 
                 case "join" -> {
                     if (loggedIn && userArgs.length == 2) {
-                        serverFacade.join();
+                        serverFacade.join(userArgs);
                     } else {
                         error();
                     }
@@ -67,7 +73,7 @@ public class ClientMain {
 
                 case "observe" -> {
                     if (loggedIn && userArgs.length == 2) {
-                        serverFacade.observe();
+                        serverFacade.observe(userArgs);
                     } else {
                         error();
                     }
@@ -84,7 +90,7 @@ public class ClientMain {
                 case "quit" -> {
                     quitStatus = false;
                     if (loggedIn && userArgs.length == 1) {
-                        serverFacade.create();
+                        serverFacade.create(userArgs);
                     } else {
                         error();
                     }
@@ -109,5 +115,8 @@ public class ClientMain {
 
     private static void error() {
         System.out.println("Invalid command or command options. Enter help for command formats.");
+    }
+    private static void httpError() {
+        System.out.println("Some error occurred on the server.");
     }
 }

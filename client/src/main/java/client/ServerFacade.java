@@ -1,13 +1,33 @@
 package client;
 
+import chess.ChessGame;
+import chess.ChessGameDeserializer;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import model.GameData;
+
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 public class ServerFacade {
+    private final Gson serializer;
+    private final String serverUrl;
+    private String authToken;
+    private final HttpClient httpClient;
 
-    public ServerFacade() {
-
+    public ServerFacade(String url) {
+        serverUrl = url;
+        httpClient = HttpClient.newHttpClient();
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameDeserializer());
+        serializer = gsonBuilder.create();
     }
 
     // logged out commands
-    public void register() {
 
     }
 
@@ -33,6 +53,17 @@ public class ServerFacade {
     }
 
     public void logout() {
-
+        //HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverUrl + "/session")).header("authorization", authToken).DELETE().build();
+        //JSONObject jsonReponse = serializer.fromJson(httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+        //        .thenApply(HttpResponse::body).join());
+        //HttpResponse<String> response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
+    }
+    public boolean clear() {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/db"))
+                .DELETE()
+                .build();
+        HttpResponse<String> response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
+        return response.statusCode() == 200;
     }
 }

@@ -1,15 +1,11 @@
 package client;
 
-import dataaccess.DataAccessException;
 import org.junit.jupiter.api.*;
 import server.Server;
-import service.AuthService;
-import service.GameService;
-import service.UserService;
-
 
 public class ServerFacadeTests {
     private static Server server;
+    private static ServerFacade serverFacade;
     private static String testUser;
     private static String testPassword;
     private static String testEmail;
@@ -18,31 +14,36 @@ public class ServerFacadeTests {
 
     @BeforeAll
     public static void init() {
+        server = new Server();
+        var port = server.run(0);
+        System.out.println("Started test HTTP server on " + port);
+        serverFacade = new ServerFacade("http://localhost:" + port);
         testUser = "rikoot";
         testPassword = "kwobanmelele";
         testEmail = "rikoot@rikoot.com";
         testAuthToken = "diklokainikimlaplokamron";
         testGameName = "kukkure";
-        server = new Server();
-        var port = server.run(0);
-        System.out.println("Started test HTTP server on " + port);
+        Assertions.assertTrue(serverFacade.clear());
     }
 
     @AfterAll
     static void stopServer() {
+        Assertions.assertTrue(serverFacade.clear());
         server.stop();
     }
 
     @Test
     @DisplayName("Register - New user")
     public void registerTestSuccess() {
-
+        String[] testArgs = {"register", testUser, testPassword, testEmail};
+        Assertions.assertTrue(serverFacade.register(testArgs));
     }
 
     @Test
     @DisplayName("Register - User Already Taken")
     public void registerTestFailure() {
-
+        String[] testArgs = {"register", testUser, testPassword, testEmail};
+        Assertions.assertFalse(serverFacade.register(testArgs));
     }
 
     @Test
