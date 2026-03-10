@@ -28,7 +28,22 @@ public class ServerFacade {
     }
 
     // logged out commands
-
+    public boolean register(String[] args) {
+        JsonObject json = new JsonObject();
+        json.addProperty("username", args[1]);
+        json.addProperty("password", args[2]);
+        json.addProperty("email", args[3]);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/user"))
+                .POST(HttpRequest.BodyPublishers.ofString(json.toString()))
+                .build();
+        HttpResponse<String> response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
+        if (response.statusCode() != 200) {
+            return false;
+        } else {
+            authToken = response.body();
+            return true;
+        }
     }
 
     public void login() {
