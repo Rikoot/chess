@@ -49,7 +49,12 @@ public class ClientMain {
                 // logged in commands
                 case "create" -> {
                     if (loggedIn && userArgs.length == 2) {
-                        serverFacade.create(userArgs);
+                        int gameID = serverFacade.create(userArgs);
+                        if (gameID == 0) {
+                            httpError();
+                        } else {
+                            System.out.println("Created new game: " + gameID);
+                        }
                     } else {
                         error();
                     }

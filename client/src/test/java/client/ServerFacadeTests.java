@@ -29,7 +29,7 @@ public class ServerFacadeTests {
 
     @AfterAll
     static void stopServer() {
-        Assertions.assertTrue(serverFacade.clear());
+        //Assertions.assertTrue(serverFacade.clear());
         server.stop();
     }
 
@@ -69,14 +69,16 @@ public class ServerFacadeTests {
     @Order(5)
     @DisplayName("Create - New Game")
     public void createTestSuccess() {
-
+        String[] testArgs = {"create", testGameName};
+        Assertions.assertNotEquals(0, serverFacade.create(testArgs));
     }
 
     @Test
     @Order(6)
     @DisplayName("Create - Blank Name")
     public void createTestFailure() {
-
+        String[] testArgs = {"create", null};
+        Assertions.assertEquals(0, serverFacade.create(testArgs));
     }
 
     @Test

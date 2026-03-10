@@ -64,7 +64,22 @@ public class ServerFacade {
     }
 
     // logged in commands
-    public void create() {
+    public int create(String[] args) {
+        JsonObject json = new JsonObject();
+        json.addProperty("gameName", args[1]);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/game"))
+                .POST(HttpRequest.BodyPublishers.ofString(json.toString()))
+                .header("authorization", authToken)
+                .build();
+        HttpResponse<String> response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
+        JsonObject responseJson = JsonParser.parseString(response.body())
+                .getAsJsonObject();
+        if (response.statusCode() == 200) {
+            return responseJson.get("gameID").getAsInt();
+        } else {
+            return 0;
+        }
 
     }
 
