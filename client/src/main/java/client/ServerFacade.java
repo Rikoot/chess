@@ -5,6 +5,7 @@ import chess.ChessGameDeserializer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import model.GameData;
 
 
@@ -37,17 +38,29 @@ public class ServerFacade {
                 .uri(URI.create(serverUrl + "/user"))
                 .POST(HttpRequest.BodyPublishers.ofString(json.toString()))
                 .build();
+        return extractAuthToken(request);
+    }
+
+    public boolean login(String[] args) {
+        JsonObject json = new JsonObject();
+        json.addProperty("username", args[1]);
+        json.addProperty("password", args[2]);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/session"))
+                .POST(HttpRequest.BodyPublishers.ofString(json.toString()))
+                .build();
+        return extractAuthToken(request);
+    }
+
+    private boolean extractAuthToken(HttpRequest request) {
         HttpResponse<String> response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
         if (response.statusCode() != 200) {
             return false;
         } else {
-            authToken = response.body();
+            authToken = JsonParser.parseString(response.body())
+                    .getAsJsonObject().get("authToken").getAsString();
             return true;
         }
-    }
-
-    public void login() {
-
     }
 
     // logged in commands

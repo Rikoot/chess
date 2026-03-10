@@ -3,6 +3,7 @@ package client;
 import org.junit.jupiter.api.*;
 import server.Server;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServerFacadeTests {
     private static Server server;
     private static ServerFacade serverFacade;
@@ -33,6 +34,7 @@ public class ServerFacadeTests {
     }
 
     @Test
+    @Order(1)
     @DisplayName("Register - New user")
     public void registerTestSuccess() {
         String[] testArgs = {"register", testUser, testPassword, testEmail};
@@ -40,6 +42,7 @@ public class ServerFacadeTests {
     }
 
     @Test
+    @Order(2)
     @DisplayName("Register - User Already Taken")
     public void registerTestFailure() {
         String[] testArgs = {"register", testUser, testPassword, testEmail};
@@ -47,72 +50,86 @@ public class ServerFacadeTests {
     }
 
     @Test
+    @Order(3)
     @DisplayName("Login - Valid User")
     public void loginTestSuccess() {
-
+        String[] testArgs = {"login", testUser, testPassword};
+        Assertions.assertTrue(serverFacade.login(testArgs));
     }
 
     @Test
-    @DisplayName("Login - Invalid User")
+    @Order(4)
+    @DisplayName("Login - Invalid Password")
     public void loginTestFailure() {
-
+        String[] testArgs = {"login", testUser, testAuthToken};
+        Assertions.assertFalse(serverFacade.login(testArgs));
     }
 
     @Test
+    @Order(5)
     @DisplayName("Create - New Game")
     public void createTestSuccess() {
 
     }
 
     @Test
+    @Order(6)
     @DisplayName("Create - Blank Name")
     public void createTestFailure() {
 
     }
 
     @Test
+    @Order(7)
     @DisplayName("List - One Game")
     public void listTestSuccess() {
 
     }
 
     @Test
+    @Order(8)
     @DisplayName("List - Invalid Auth Token")
     public void listTestFailure() {
 
     }
 
     @Test
+    @Order(9)
     @DisplayName("Join - Valid GameID")
     public void joinTestSuccess() {
 
     }
 
     @Test
+    @Order(10)
     @DisplayName("Join - Invalid GameID")
     public void joinTestFailure() {
 
     }
 
     @Test
+    @Order(11)
     @DisplayName("Observe - Valid GameID")
     public void observeTestSuccess() {
 
     }
 
     @Test
+    @Order(12)
     @DisplayName("Observe - Invalid GameID")
     public void observeTestFailure() {
 
     }
 
     @Test
+    @Order(13)
     @DisplayName("Logout - Valid GameID")
     public void logoutTestSuccess() {
 
     }
 
     @Test
+    @Order(14)
     @DisplayName("Logout - Invalid GameID")
     public void logoutTestFailure() {
 
