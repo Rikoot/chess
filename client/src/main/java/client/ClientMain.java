@@ -2,6 +2,7 @@ package client;
 
 import chess.*;
 import model.GameData;
+import ui.PrintGame;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -101,7 +102,12 @@ public class ClientMain {
 
                 case "observe" -> {
                     if (loggedIn && userArgs.length == 2) {
-                        serverFacade.observe(userArgs);
+                       ChessGame game =  serverFacade.observe(userArgs);
+                       if (game == null) {
+                           httpError();
+                       } else {
+                           System.out.println(PrintGame.print(game));
+                       }
                     } else {
                         error();
                     }

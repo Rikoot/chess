@@ -133,15 +133,24 @@ public class ServerFacade {
         return response.statusCode() == 200;
     }
 
-    public void observe() {
-
+    public ChessGame observe(String[] args) {
+        Collection<GameData> chessGameCollection = list();
+        for (GameData gameData : chessGameCollection) {
+            if (gameData.gameID() == Integer.parseInt(args[1])) {
+                return gameData.game();
+            }
+        }
+        return null;
     }
 
-    public void logout() {
-        //HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverUrl + "/session")).header("authorization", authToken).DELETE().build();
-        //JSONObject jsonReponse = serializer.fromJson(httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-        //        .thenApply(HttpResponse::body).join());
-        //HttpResponse<String> response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
+    public boolean logout() {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/session"))
+                .DELETE()
+                .header("authorization", authToken)
+                .build();
+        HttpResponse<String> response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
+        return response.statusCode() == 200;
     }
     public boolean clear() {
         HttpRequest request = HttpRequest.newBuilder()

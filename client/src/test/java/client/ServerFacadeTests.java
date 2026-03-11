@@ -116,27 +116,29 @@ public class ServerFacadeTests {
     @Order(11)
     @DisplayName("Observe - Valid GameID")
     public void observeTestSuccess() {
-
+        String[] testArgs = {"observe", "1"};
+        Assertions.assertNotNull(serverFacade.observe(testArgs));
     }
 
     @Test
     @Order(12)
     @DisplayName("Observe - Invalid GameID")
     public void observeTestFailure() {
-
+        String[] testArgs = {"observe", "0"};
+        Assertions.assertNull(serverFacade.observe(testArgs));
     }
 
     @Test
     @Order(13)
-    @DisplayName("Logout - Valid GameID")
+    @DisplayName("Logout - Valid Session")
     public void logoutTestSuccess() {
-
+        Assertions.assertTrue(serverFacade.logout());
     }
 
     @Test
     @Order(14)
-    @DisplayName("Logout - Invalid GameID")
+    @DisplayName("Logout - Invalid Session")
     public void logoutTestFailure() {
-
+        Assertions.assertFalse(serverFacade.logout());
     }
 }
