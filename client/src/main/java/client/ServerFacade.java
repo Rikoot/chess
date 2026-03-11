@@ -27,6 +27,7 @@ public class ServerFacade {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameDeserializer());
         serializer = gsonBuilder.create();
+        authToken = "temp-authToken";
     }
 
     // logged out commands

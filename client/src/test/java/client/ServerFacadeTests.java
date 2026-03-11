@@ -91,9 +91,10 @@ public class ServerFacadeTests {
 
     @Test
     @Order(8)
-    @DisplayName("List - ")
+    @DisplayName("List - User not logged in")
     public void listTestFailure() {
-        Assertions.assertNotNull(serverFacade.list());
+        ServerFacade tempServerFacade = new ServerFacade("http://localhost:" + port);
+        Assertions.assertNull(tempServerFacade.list());
     }
 
     @Test
