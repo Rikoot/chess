@@ -12,11 +12,12 @@ public class ServerFacadeTests {
     private static String testEmail;
     private static String testAuthToken;
     private static String testGameName;
+    private static int port;
 
     @BeforeAll
     public static void init() {
         server = new Server();
-        var port = server.run(0);
+        port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
         serverFacade = new ServerFacade("http://localhost:" + port);
         testUser = "rikoot";
@@ -85,14 +86,14 @@ public class ServerFacadeTests {
     @Order(7)
     @DisplayName("List - One Game")
     public void listTestSuccess() {
-
+        Assertions.assertNotNull(serverFacade.list());
     }
 
     @Test
     @Order(8)
-    @DisplayName("List - Invalid Auth Token")
+    @DisplayName("List - ")
     public void listTestFailure() {
-
+        Assertions.assertNotNull(serverFacade.list());
     }
 
     @Test

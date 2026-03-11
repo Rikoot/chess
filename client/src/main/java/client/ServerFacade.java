@@ -2,10 +2,7 @@ package client;
 
 import chess.ChessGame;
 import chess.ChessGameDeserializer;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import model.GameData;
 
 
@@ -13,6 +10,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.concurrent.CompletableFuture;
 
 public class ServerFacade {
     private final Gson serializer;
@@ -83,8 +84,41 @@ public class ServerFacade {
 
     }
 
-    public void list() {
-
+    public Collection<GameData> list() {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/game"))
+                .GET()
+                .header("authorization", authToken)
+                .build();
+        HttpResponse<String> response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .join();
+        if (response.statusCode() != 200) {
+            return null;
+        }
+        Collection<GameData> gameDataCollection = new HashSet<>();
+        JsonArray responseJson = JsonParser.parseString(response.body())
+                .getAsJsonObject()
+                .get("games").getAsJsonArray();
+        if (responseJson.isEmpty()) {
+            gameDataCollection.add(new GameData(0,
+                    null, null, null, null));
+            return  gameDataCollection;
+        }
+        for (int i = 0; i < responseJson.size(); i++) {
+            JsonObject gameData = responseJson.get(i).getAsJsonObject();
+            int gameID = gameData.get("gameID").getAsInt();
+            String whiteUsername =  (gameData.get("whiteUsername") == null) ? null : gameData.get("whiteUsername").getAsString();
+            String blackUsername = (gameData.get("blackUsername") == null) ? null : gameData.get("blackUsername").getAsString();
+            String gameName = gameData.get("gameName").getAsString();
+            ChessGame chessGame = serializer.fromJson(gameData.get("game"), ChessGame.class);
+            gameDataCollection.add(new GameData(
+                    gameID,
+                    whiteUsername,
+                    blackUsername,
+                    gameName,
+                    chessGame));
+        }
+        return gameDataCollection;
     }
 
     public void join() {
@@ -109,4 +143,5 @@ public class ServerFacade {
         HttpResponse<String> response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
         return response.statusCode() == 200;
     }
+
 }

@@ -1,7 +1,9 @@
 package client;
 
 import chess.*;
+import model.GameData;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -62,7 +64,24 @@ public class ClientMain {
 
                 case "list" -> {
                     if (loggedIn && userArgs.length == 1) {
-                        serverFacade.list();
+                        Collection<GameData> gameDataCollection = serverFacade.list();
+                        if (gameDataCollection.isEmpty()) {
+                            httpError();
+                        } else if (gameDataCollection.size() == 1
+                                && gameDataCollection.contains(
+                                        new GameData(0, null, null, null, null))) {
+                            System.out.println("There are no games, feel free to create one!");
+                        } else {
+                            System.out.println("Below are the following games:");
+                            int gameCounter = 1;
+                            for (GameData gameData : gameDataCollection) {
+                                System.out.println("Game #: " + gameCounter++);
+                                System.out.println("Name:" + gameData.gameName());
+                                System.out.println("White User: " + gameData.whiteUsername());
+                                System.out.println("Black User: " + gameData.blackUsername());
+                                System.out.println("----------");
+                            }
+                        }
                     } else {
                         error();
                     }
@@ -94,9 +113,7 @@ public class ClientMain {
                 // generic commands
                 case "quit" -> {
                     quitStatus = false;
-                    if (loggedIn && userArgs.length == 1) {
-                        serverFacade.create(userArgs);
-                    } else {
+                    if (userArgs.length != 1) {
                         error();
                     }
                 }
