@@ -100,14 +100,16 @@ public class ServerFacadeTests {
     @Order(9)
     @DisplayName("Join - Valid GameID")
     public void joinTestSuccess() {
-
+        String[] testArgs = {"join", "BLACK", "1"};
+        Assertions.assertTrue(serverFacade.join(testArgs));
     }
 
     @Test
     @Order(10)
     @DisplayName("Join - Invalid GameID")
     public void joinTestFailure() {
-
+        String[] testArgs = {"join", "BLACK", "0"};
+        Assertions.assertFalse(serverFacade.join(testArgs));
     }
 
     @Test

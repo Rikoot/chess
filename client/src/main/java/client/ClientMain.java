@@ -88,8 +88,12 @@ public class ClientMain {
                 }
 
                 case "join" -> {
-                    if (loggedIn && userArgs.length == 2) {
-                        serverFacade.join(userArgs);
+                    if (loggedIn && userArgs.length == 3) {
+                        if (serverFacade.join(userArgs)) {
+                            System.out.println("Joined game!");
+                        } else {
+                            httpError();
+                        }
                     } else {
                         error();
                     }

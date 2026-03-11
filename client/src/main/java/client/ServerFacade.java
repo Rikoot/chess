@@ -121,8 +121,16 @@ public class ServerFacade {
         return gameDataCollection;
     }
 
-    public void join() {
-
+    public boolean join(String[] args) {
+        JsonObject json = new JsonObject();
+        json.addProperty("playerColor", args[1]);
+        json.addProperty("gameID", args[2]);
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverUrl + "/game"))
+                .PUT(HttpRequest.BodyPublishers.ofString(json.toString()))
+                .header("authorization", authToken)
+                .build();
+        HttpResponse<String> response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
+        return response.statusCode() == 200;
     }
 
     public void observe() {
