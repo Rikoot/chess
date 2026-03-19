@@ -94,7 +94,7 @@ public class ClientMain {
                     if (gameID == 0) {
                         httpError();
                     } else {
-                        System.out.println("Created new game: " + gameID);
+                        System.out.println("Created new game!");
                     }
                 } else {
                     error();
@@ -173,7 +173,9 @@ public class ClientMain {
 
             case "logout" -> {
                 if (loggedIn && userArgs.length == 1) {
-                    serverFacade.logout();
+                    if (serverFacade.logout()) {
+                        loggedIn = false;
+                    }
                 } else {
                     error();
                 }
