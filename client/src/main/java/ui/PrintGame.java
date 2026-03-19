@@ -13,7 +13,9 @@ public class PrintGame {
         int direction = -1;
         String backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
         output.append(backgroundColor);
-        output.append(EscapeSequences.EMPTY.repeat(10));
+        String columns = (teamColor == ChessGame.TeamColor.WHITE)
+                ? "   a   b   c   d   e   f   g   h   " : "   h   g   f   e   d   c   b   a   ";
+        output.append(columns);
         output.append(EscapeSequences.RESET_BG_COLOR);
         output.append("\n");
         if (teamColor == ChessGame.TeamColor.BLACK) {
@@ -26,7 +28,9 @@ public class PrintGame {
         String tileBackgroundColor = whiteTile;
         for (int row = start; row != end; row += direction) {
             output.append(backgroundColor);
-            output.append(EscapeSequences.EMPTY);
+            output.append(" ");
+            output.append(row);
+            output.append(" ");
             for (int col = 1; col <= 8; col++) {
                 output.append(tileBackgroundColor);
                 if (col < 8) {
@@ -37,12 +41,14 @@ public class PrintGame {
                 output.append(convertPiece(piece));
             }
             output.append(backgroundColor);
-            output.append(EscapeSequences.EMPTY);
+            output.append(" ");
+            output.append(row);
+            output.append(" ");
             output.append(EscapeSequences.RESET_BG_COLOR);
             output.append("\n");
         }
         output.append(backgroundColor);
-        output.append(EscapeSequences.EMPTY.repeat(10));
+        output.append(columns);
         output.append(EscapeSequences.RESET_BG_COLOR);
         output.append("\n");
         return output.toString();
