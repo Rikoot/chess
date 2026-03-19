@@ -155,6 +155,7 @@ public class Server {
 
     private void handleCreateGame(Context ctx) {
         CreateRequest createRequest = serializer.fromJson(ctx.body(), CreateRequest.class);
+        createRequest = new CreateRequest(createRequest.gameName(), ctx.header("authorization"));
         if (createRequest.gameName() == null) {
             ErrorData errorData = new ErrorData("Error: Bad Request");
             ctx.status(400).json(serializer.toJson(errorData));

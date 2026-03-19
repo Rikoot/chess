@@ -52,19 +52,24 @@ public class GameSQLDAO {
     }
 
     public int createGame(String gameName) throws DataAccessException{
-        int gameID = gameIDCount++;
         ChessGame newGame = new ChessGame();
-        String statement = "INSERT INTO Games VALUES (?, ?, ?, ?, ?);";
+        int gameID = 0;
+        String statement = "INSERT INTO Games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?);";
         Connection conn = null;
         conn = DatabaseManager.getConnection();
         try {
             PreparedStatement preparedStatement = conn.prepareStatement(statement);
-            preparedStatement.setInt(1, gameID);
+            preparedStatement.setString(1, null);
             preparedStatement.setString(2, null);
-            preparedStatement.setString(3, null);
-            preparedStatement.setString(4, gameName);
-            preparedStatement.setString(5, serializer.toJson(newGame));
+            preparedStatement.setString(3, gameName);
+            preparedStatement.setString(4, serializer.toJson(newGame));
             preparedStatement.executeUpdate();
+            ResultSet resultSet = conn.prepareStatement("SELECT LAST_INSERT_ID() AS gameID;").executeQuery();
+            if (!resultSet.next()) {
+                throw new DataAccessException("Error: Game ID Not Valid");
+            }
+            gameID = resultSet.getInt("gameID");
+            
         } catch (SQLException e) {
             throw new DataAccessException("Error: Couldn't create Game");
         }
@@ -135,7 +140,7 @@ public class GameSQLDAO {
     private void createDb() throws DataAccessException {
         String statement = """
 CREATE TABLE IF NOT EXISTS Games (
-    gameID INT NOT NULL,
+    gameID INT AUTO_INCREMENT NOT NULL,
     whiteUsername VARCHAR(255),
     blackUsername VARCHAR(255),
     gameName VARCHAR(255) NOT NULL,
