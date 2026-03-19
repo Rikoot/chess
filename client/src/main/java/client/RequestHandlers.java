@@ -77,7 +77,8 @@ public class RequestHandlers {
         }
     }
 
-    public static void handleList(ServerFacade serverFacade, boolean loggedIn, String[] userArgs, Collection<GameData> gameDataCollection) throws ConnectException {
+    public static void handleList(ServerFacade serverFacade, boolean loggedIn,
+                                  String[] userArgs, Collection<GameData> gameDataCollection) throws ConnectException {
         if (loggedIn && userArgs.length == 1) {
             gameDataCollection = serverFacade.list();
             if (gameDataCollection.isEmpty()) {
@@ -102,7 +103,8 @@ public class RequestHandlers {
         }
     }
 
-    public static void handleJoin(ServerFacade serverFacade, boolean loggedIn, String[] userArgs, String username, Collection<GameData> gameDataCollection) throws ConnectException {
+    public static void handleJoin(ServerFacade serverFacade, boolean loggedIn,
+                                  String[] userArgs, String username, Collection<GameData> gameDataCollection) throws ConnectException {
         if (loggedIn && userArgs.length == 3) {
             if (gameDataCollection == null) {
                 System.out.println("List games first!");
@@ -133,7 +135,8 @@ public class RequestHandlers {
         }
     }
 
-    public static void handleObserve(ServerFacade serverFacade, boolean loggedIn, String[] userArgs,Collection<GameData> gameDataCollection) throws ConnectException {
+    public static void handleObserve(ServerFacade serverFacade, boolean loggedIn,
+                                     String[] userArgs,Collection<GameData> gameDataCollection) throws ConnectException {
         if (loggedIn && userArgs.length == 2) {
             if (gameDataCollection == null) {
                 System.out.println("List games first!");
