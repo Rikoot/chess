@@ -116,7 +116,7 @@ public class RequestHandlers {
                 return;
             }
             userArgs[1] = userArgs[1].toUpperCase();
-            if (userArgs[1] != "BLACK" | userArgs[1] != "WHITE") {
+            if (!userArgs[1].equals("BLACK") & !userArgs[1].equals("WHITE")) {
                 argsError();
                 return;
             }
@@ -138,8 +138,12 @@ public class RequestHandlers {
                     return;
                 }
                 System.out.println("Joined game!");
-                ChessGame.TeamColor teamColor = (Objects.equals(gameData.blackUsername(), username))
-                        ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+                ChessGame.TeamColor teamColor;
+                if (userArgs[1].equals("BLACK")) {
+                    teamColor = ChessGame.TeamColor.BLACK;
+                } else {
+                    teamColor = ChessGame.TeamColor.WHITE;
+                }
                 System.out.println(PrintGame.print(gameData.game(), teamColor));
             } else {
                 httpError();

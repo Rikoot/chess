@@ -8,8 +8,10 @@ public class PrintGame {
 
     public static String print(ChessGame game, ChessGame.TeamColor teamColor) {
         StringBuilder output = new StringBuilder();
-        int start = 8;
-        int end = 0;
+        int rowStart = 8;
+        int rowEnd = 0;
+        int colStart = 1;
+        int colEnd = 9;
         int direction = -1;
         String backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
         output.append(backgroundColor);
@@ -19,21 +21,23 @@ public class PrintGame {
         output.append(EscapeSequences.RESET_BG_COLOR);
         output.append("\n");
         if (teamColor == ChessGame.TeamColor.BLACK) {
-            start = 1;
-            end = 9;
+            rowStart = 1;
+            rowEnd = 9;
+            colStart = 8;
+            colEnd = 0;
             direction = 1;
         }
         String blackTile = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
         String whiteTile = EscapeSequences.SET_BG_COLOR_RED;
         String tileBackgroundColor = whiteTile;
-        for (int row = start; row != end; row += direction) {
+        for (int row = rowStart; row != rowEnd; row += direction) {
             output.append(backgroundColor);
             output.append(" ");
             output.append(row);
             output.append(" ");
-            for (int col = 1; col <= 8; col++) {
+            for (int col = colStart; col != colEnd; col -= direction) {
                 output.append(tileBackgroundColor);
-                if (col < 8) {
+                if (col != colEnd + direction) {
                     tileBackgroundColor = (tileBackgroundColor.equals(blackTile))
                             ? whiteTile : blackTile;
                 }
