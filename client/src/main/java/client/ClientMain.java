@@ -3,13 +3,21 @@ package client;
 import chess.*;
 import model.GameData;
 import ui.PrintGame;
+
+import java.io.IOException;
 import java.net.ConnectException;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Scanner;
 
 public class ClientMain {
-    boolean loggedIn = false;
+
+    private static Collection<GameData> gameDataCollection;
+    private static boolean loggedIn;
+    private static boolean quitStatus;
+    private static String username;
+    private static ServerFacade serverFacade;
 
     public static void main(String[] args) {
         System.out.println("Welcome to rikoot's chess client.\nType help to get started.");
@@ -17,11 +25,13 @@ public class ClientMain {
         if (args.length == 1) {
             serverUrl = args[0];
         }
-        ServerFacade serverFacade = new ServerFacade(serverUrl);
+        serverFacade = new ServerFacade(serverUrl);
         Scanner scanner = new Scanner(System.in);
-        boolean loggedIn = false;
-        boolean quitStatus = true;
-        String username = null;
+        loggedIn = false;
+        quitStatus = true;
+        username = null;
+        gameDataCollection = null;
+
         while (quitStatus) {
             if (loggedIn) {
                 System.out.print("[Logged in] >>>> ");
@@ -31,10 +41,10 @@ public class ClientMain {
             String userInput = scanner.nextLine();
             String[] userArgs = userInput.split(" ");
             try {
-                boolean[] returnValues = handleRequest(quitStatus, loggedIn, userArgs, serverFacade, username);
+                boolean[] returnValues = handleRequest(userArgs);
                 quitStatus = returnValues[0];
                 loggedIn = returnValues[1];
-            } catch (ConnectException e) {
+            } catch (Exception e) {
                 httpError();
             }
 
@@ -48,7 +58,7 @@ public class ClientMain {
     private static void httpError() {
         System.out.println("Some error occurred on the server.");
     }
-    private static boolean[] handleRequest(boolean quitStatus, boolean loggedIn, String[] userArgs, ServerFacade serverFacade, String username) throws ConnectException {
+    private static boolean[] handleRequest(String[] userArgs) throws ConnectException {
         switch (userArgs[0].toLowerCase()) {
             // logged out commands
             case "register" -> {
@@ -93,7 +103,7 @@ public class ClientMain {
 
             case "list" -> {
                 if (loggedIn && userArgs.length == 1) {
-                    Collection<GameData> gameDataCollection = serverFacade.list();
+                    gameDataCollection = serverFacade.list();
                     if (gameDataCollection.isEmpty()) {
                         httpError();
                     } else if (gameDataCollection.size() == 1
@@ -101,7 +111,7 @@ public class ClientMain {
                             new GameData(0, null, null, null, null))) {
                         System.out.println("There are no games, feel free to create one!");
                     } else {
-                        System.out.println("Below are the following games:");
+                        System.out.println("Below are the available games:\n----------");
                         int gameCounter = 1;
                         for (GameData gameData : gameDataCollection) {
                             System.out.println("Game #: " + gameCounter++);
@@ -118,8 +128,23 @@ public class ClientMain {
 
             case "join" -> {
                 if (loggedIn && userArgs.length == 3) {
+                    if (gameDataCollection == null) {
+                        System.out.println("List games first!");
+                        break;
+                    }
+                    userArgs[2] = convertGameNumber(userArgs[2]);
                     if (serverFacade.join(userArgs)) {
+                        GameData gameData = null;
+                        for (GameData game : gameDataCollection) {
+                            if (game.gameID() == Integer.parseInt(userArgs[2])) {
+                                gameData = game;
+                                break;
+                            }
+                        }
                         System.out.println("Joined game!");
+                        ChessGame.TeamColor teamColor = (Objects.equals(gameData.blackUsername(), username))
+                                ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+                        System.out.println(PrintGame.print(gameData.game(), teamColor));
                     } else {
                         httpError();
                     }
@@ -130,15 +155,16 @@ public class ClientMain {
 
             case "observe" -> {
                 if (loggedIn && userArgs.length == 2) {
+                    if (gameDataCollection == null) {
+                        System.out.println("List games first!");
+                        break;
+                    }
+                    userArgs[1] = convertGameNumber(userArgs[1]);
                     GameData gameData =  serverFacade.observe(userArgs);
                     if (gameData == null) {
                         httpError();
                     } else {
-                        ChessGame.TeamColor teamColor = ChessGame.TeamColor.WHITE;
-                        if (Objects.equals(gameData.blackUsername(), username)) {
-                            teamColor = ChessGame.TeamColor.BLACK;
-                        }
-                        System.out.println(PrintGame.print(gameData.game(), teamColor));
+                        System.out.println(PrintGame.print(gameData.game(), ChessGame.TeamColor.WHITE));
                     }
                 } else {
                     error();
@@ -165,7 +191,7 @@ public class ClientMain {
                     System.out.println("""
                                 create [NAME] - create a new game
                                 list - list all games
-                                join [COLOR] [GAMEID] - join a game
+                                join [COLOR(BLACK|WHITE)] [GAMEID] - join a game
                                 observe [GAMEID] - watch a game
                                 logout - end your session
                                 quit - exit the client
@@ -187,5 +213,18 @@ public class ClientMain {
             }
         }
         return new boolean[]{quitStatus, loggedIn};
+    }
+    public static String convertGameNumber(String number) {
+        int gameNumber = Integer.parseInt(number);
+        GameData gameData = null;
+        Iterator<GameData> iterator = gameDataCollection.iterator();
+        for (int i = 0; i < gameNumber; i++) {
+            if (iterator.hasNext()) {
+                gameData = iterator.next();
+            } else {
+                break;
+            }
+        }
+        return String.valueOf((gameData != null) ? gameData.gameID() : 0);
     }
 }

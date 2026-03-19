@@ -72,9 +72,9 @@ public class ServerFacade {
                 .header("authorization", authToken)
                 .build();
         HttpResponse<String> response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
-        JsonObject responseJson = JsonParser.parseString(response.body())
-                .getAsJsonObject();
         if (response.statusCode() == 200) {
+            JsonObject responseJson = JsonParser.parseString(response.body())
+                    .getAsJsonObject();
             return responseJson.get("gameID").getAsInt();
         } else {
             return 0;
@@ -121,8 +121,8 @@ public class ServerFacade {
 
     public boolean join(String[] args) throws ConnectException {
         JsonObject json = new JsonObject();
-        json.addProperty("playerColor", args[1]);
-        json.addProperty("gameID", args[2]);
+        json.addProperty("playerColor", args[1].toUpperCase());
+        json.addProperty("gameID", Integer.parseInt(args[2]));
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverUrl + "/game"))
                 .PUT(HttpRequest.BodyPublishers.ofString(json.toString()))
                 .header("authorization", authToken)
