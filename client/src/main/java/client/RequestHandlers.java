@@ -115,7 +115,16 @@ public class RequestHandlers {
                 System.out.println("List games first!");
                 return;
             }
+            userArgs[1] = userArgs[1].toUpperCase();
+            if (userArgs[1] != "BLACK" | userArgs[1] != "WHITE") {
+                argsError();
+                return;
+            }
             userArgs[2] = convertGameNumber(userArgs[2], gameDataCollection);
+            if (userArgs[2] == null) {
+                argsError();
+                return;
+            }
             if (serverFacade.join(userArgs)) {
                 GameData gameData = null;
                 for (GameData game : gameDataCollection) {
@@ -148,6 +157,10 @@ public class RequestHandlers {
                 return;
             }
             userArgs[1] = convertGameNumber(userArgs[1], gameDataCollection);
+            if (userArgs[1] == null) {
+                argsError();
+                return;
+            }
             GameData gameData =  serverFacade.observe(userArgs);
             if (gameData == null) {
                 httpError();
@@ -169,7 +182,12 @@ public class RequestHandlers {
     }
 
     private static String convertGameNumber(String number, Collection<GameData> gameDataCollection) {
-        int gameNumber = Integer.parseInt(number);
+        int gameNumber;
+        try {
+            gameNumber = Integer.parseInt(number);
+        } catch (NumberFormatException e) {
+            return null;
+        }
         GameData gameData = null;
         Iterator<GameData> iterator = gameDataCollection.iterator();
         for (int i = 0; i < gameNumber; i++) {

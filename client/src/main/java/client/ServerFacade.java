@@ -121,7 +121,7 @@ public class ServerFacade {
 
     public boolean join(String[] args) throws ConnectException {
         JsonObject json = new JsonObject();
-        json.addProperty("playerColor", args[1].toUpperCase());
+        json.addProperty("playerColor", args[1]);
         json.addProperty("gameID", Integer.parseInt(args[2]));
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverUrl + "/game"))
                 .PUT(HttpRequest.BodyPublishers.ofString(json.toString()))
