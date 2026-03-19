@@ -10,11 +10,14 @@ import java.util.Iterator;
 import java.util.Objects;
 
 public class RequestHandlers {
-    public static void error() {
-        System.out.println("Invalid command or command options. Enter help for command formats.");
+    public static void commandError() {
+        System.out.println("Invalid command. Enter help for available commands.");
+    }
+    public static void argsError() {
+        System.out.println("Invalid command options. Enter help for command formats.");
     }
     public static void httpError() {
-        System.out.println("Some error occurred on the server.");
+        System.out.println("Some error occurred between the client and server.");
     }
     public static void printHelp(boolean loggedIn) {
         if (loggedIn) {
@@ -37,31 +40,31 @@ public class RequestHandlers {
         }
     }
 
-    public static void handleRegister(ServerFacade serverFacade, boolean loggedIn, String[] userArgs, String username) throws ConnectException {
+    public static boolean handleRegister(ServerFacade serverFacade, boolean loggedIn, String[] userArgs) throws ConnectException {
         if (!loggedIn && userArgs.length == 4) {
             if (serverFacade.register(userArgs)) {
-                loggedIn = true;
-                username = userArgs[1];
+                return true;
             } else {
                 httpError();
             }
         } else {
-            error();
+            argsError();
         }
+        return false;
     }
 
-    public static void handleLogin(ServerFacade serverFacade, boolean loggedIn, String[] userArgs, String username) throws ConnectException {
+    public static boolean handleLogin(ServerFacade serverFacade, boolean loggedIn, String[] userArgs) throws ConnectException {
         if (!loggedIn && userArgs.length == 3) {
             if (serverFacade.login(userArgs)) {
-                loggedIn = true;
-                username = userArgs[1];
+                return true;
             } else {
                 httpError();
             }
 
         } else {
-            error();
+            argsError();
         }
+        return false;
     }
 
     public static void handleCreate(ServerFacade serverFacade, boolean loggedIn, String[] userArgs) throws ConnectException {
@@ -73,14 +76,14 @@ public class RequestHandlers {
                 System.out.println("Created new game!");
             }
         } else {
-            error();
+            argsError();
         }
     }
 
-    public static void handleList(ServerFacade serverFacade, boolean loggedIn,
-                                  String[] userArgs, Collection<GameData> gameDataCollection) throws ConnectException {
+    public static Collection<GameData> handleList(ServerFacade serverFacade, boolean loggedIn,
+                                  String[] userArgs) throws ConnectException {
         if (loggedIn && userArgs.length == 1) {
-            gameDataCollection = serverFacade.list();
+            Collection<GameData> gameDataCollection = serverFacade.list();
             if (gameDataCollection.isEmpty()) {
                 httpError();
             } else if (gameDataCollection.size() == 1
@@ -98,8 +101,10 @@ public class RequestHandlers {
                     System.out.println("----------");
                 }
             }
+            return gameDataCollection;
         } else {
-            error();
+            argsError();
+            return null;
         }
     }
 
@@ -131,7 +136,7 @@ public class RequestHandlers {
                 httpError();
             }
         } else {
-            error();
+            argsError();
         }
     }
 
@@ -150,18 +155,17 @@ public class RequestHandlers {
                 System.out.println(PrintGame.print(gameData.game(), ChessGame.TeamColor.WHITE));
             }
         } else {
-            error();
+            argsError();
         }
     }
 
-    public static void handleLogout(ServerFacade serverFacade, boolean loggedIn, String[] userArgs) throws ConnectException {
+    public static boolean handleLogout(ServerFacade serverFacade, boolean loggedIn, String[] userArgs) throws ConnectException {
         if (loggedIn && userArgs.length == 1) {
-            if (serverFacade.logout()) {
-                loggedIn = false;
-            }
+            return !serverFacade.logout();
         } else {
-            error();
+            argsError();
         }
+        return true;
     }
 
     private static String convertGameNumber(String number, Collection<GameData> gameDataCollection) {

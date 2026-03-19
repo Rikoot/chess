@@ -1,6 +1,5 @@
 package client;
 
-import chess.*;
 import model.GameData;
 
 import java.net.ConnectException;
@@ -50,11 +49,17 @@ public class ClientMain {
         switch (userArgs[0].toLowerCase()) {
             // logged out commands
             case "register" -> {
-                RequestHandlers.handleRegister(serverFacade, loggedIn, userArgs, username);
+                loggedIn = RequestHandlers.handleRegister(serverFacade, loggedIn, userArgs);
+                if (loggedIn) {
+                    username = userArgs[1];
+                }
             }
 
             case "login" -> {
-                RequestHandlers.handleLogin(serverFacade, loggedIn, userArgs, username);
+                loggedIn = RequestHandlers.handleLogin(serverFacade, loggedIn, userArgs);
+                if (loggedIn) {
+                    username = userArgs[1];
+                }
             }
             // logged in commands
             case "create" -> {
@@ -62,7 +67,7 @@ public class ClientMain {
             }
 
             case "list" -> {
-                RequestHandlers.handleList(serverFacade, loggedIn, userArgs, gameDataCollection);
+                gameDataCollection = RequestHandlers.handleList(serverFacade, loggedIn, userArgs);
             }
 
             case "join" -> {
@@ -74,21 +79,21 @@ public class ClientMain {
             }
 
             case "logout" -> {
-                RequestHandlers.handleLogout(serverFacade, loggedIn, userArgs);
+                loggedIn = RequestHandlers.handleLogout(serverFacade, loggedIn, userArgs);
             }
             // generic commands
             case "quit" -> {
-                quitStatus = false;
                 if (userArgs.length != 1) {
-                    RequestHandlers.error();
+                    RequestHandlers.argsError();
                 }
+                quitStatus = false;
             }
 
             case "help" -> {
                 RequestHandlers.printHelp(loggedIn);
             }
             default -> {
-                RequestHandlers.error();
+                RequestHandlers.commandError();
             }
         }
     }
