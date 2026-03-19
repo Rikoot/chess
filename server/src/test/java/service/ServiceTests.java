@@ -28,11 +28,11 @@ public class ServiceTests {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-        testUser = "rikoot";
-        testPassword = "kwobanmelele";
-        testEmail = "rikoot@rikoot.com";
-        testAuthToken = "diklokainikimlaplokamron";
-        testGameName = "kukkure";
+        testUser = "rikoot2";
+        testPassword = "kwobanmelele2";
+        testEmail = "rikoot2@rikoot.com";
+        testAuthToken = "diklokainikimlaplokamron2";
+        testGameName = "kukkure2";
     }
 
     @BeforeEach
