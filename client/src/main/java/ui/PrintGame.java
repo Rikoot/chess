@@ -2,27 +2,54 @@ package ui;
 
 import chess.ChessGame;
 import chess.ChessPiece;
+import chess.ChessPosition;
 
 public class PrintGame {
 
     public static String print(ChessGame game, ChessGame.TeamColor teamColor) {
         StringBuilder output = new StringBuilder();
-        int start = 0;
+        int start = 8;
         int end = 0;
-        int direction = 0;
-
-        output.append(EscapeSequences.SET_BG_COLOR_BLUE);
-        output.append(EscapeSequences.EMPTY);
+        int direction = -1;
+        String backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
+        output.append(backgroundColor);
+        output.append(EscapeSequences.EMPTY.repeat(10));
+        output.append(EscapeSequences.RESET_BG_COLOR);
+        output.append("\n");
         if (teamColor == ChessGame.TeamColor.BLACK) {
-            start = 8;
-            end = 8;
+            start = 1;
+            end = 9;
+            direction = 1;
         }
-
-        output.append("");
+        String blackTile = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+        String whiteTile = EscapeSequences.SET_BG_COLOR_RED;
+        String tileBackgroundColor = whiteTile;
+        for (int row = start; row != end; row += direction) {
+            output.append(backgroundColor);
+            output.append(EscapeSequences.EMPTY);
+            for (int col = 1; col <= 8; col++) {
+                output.append(tileBackgroundColor);
+                if (col < 8) {
+                    tileBackgroundColor = (tileBackgroundColor.equals(blackTile))
+                            ? whiteTile : blackTile;
+                }
+                ChessPiece piece = game.getBoard().getPiece(new ChessPosition(row, col));
+                output.append(convertPiece(piece));
+            }
+            output.append(backgroundColor);
+            output.append(EscapeSequences.EMPTY);
+            output.append(EscapeSequences.RESET_BG_COLOR);
+            output.append("\n");
+        }
+        output.append(backgroundColor);
+        output.append(EscapeSequences.EMPTY.repeat(10));
+        output.append(EscapeSequences.RESET_BG_COLOR);
+        output.append("\n");
         return output.toString();
     }
 
-    private static String getChessPieceString(ChessPiece piece) {
+    private static String convertPiece(ChessPiece piece) {
+        if (piece == null) { return EscapeSequences.EMPTY;}
         switch (piece.getPieceType()){
             case QUEEN -> {
                 return (piece.getTeamColor() == ChessGame.TeamColor.BLACK)
@@ -46,7 +73,7 @@ public class PrintGame {
             }
             case KING -> {
                 return (piece.getTeamColor() == ChessGame.TeamColor.BLACK)
-                        ? EscapeSequences.BLACK_KING : EscapeSequences.WHITE_KING;
+                        ? (EscapeSequences.BLACK_KING) : EscapeSequences.WHITE_KING;
             }
             case null, default -> {
                 return EscapeSequences.EMPTY;

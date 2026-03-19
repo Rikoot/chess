@@ -4,16 +4,13 @@ import chess.ChessGame;
 import chess.ChessGameDeserializer;
 import com.google.gson.*;
 import model.GameData;
-
-
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpTimeoutException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.concurrent.CompletableFuture;
 
 public class ServerFacade {
     private final Gson serializer;
@@ -31,7 +28,7 @@ public class ServerFacade {
     }
 
     // logged out commands
-    public boolean register(String[] args) {
+    public boolean register(String[] args) throws ConnectException {
         JsonObject json = new JsonObject();
         json.addProperty("username", args[1]);
         json.addProperty("password", args[2]);
@@ -43,7 +40,7 @@ public class ServerFacade {
         return extractAuthToken(request);
     }
 
-    public boolean login(String[] args) {
+    public boolean login(String[] args) throws ConnectException {
         JsonObject json = new JsonObject();
         json.addProperty("username", args[1]);
         json.addProperty("password", args[2]);
@@ -54,7 +51,7 @@ public class ServerFacade {
         return extractAuthToken(request);
     }
 
-    private boolean extractAuthToken(HttpRequest request) {
+    private boolean extractAuthToken(HttpRequest request) throws ConnectException {
         HttpResponse<String> response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
         if (response.statusCode() != 200) {
             return false;
@@ -66,7 +63,7 @@ public class ServerFacade {
     }
 
     // logged in commands
-    public int create(String[] args) {
+    public int create(String[] args) throws ConnectException {
         JsonObject json = new JsonObject();
         json.addProperty("gameName", args[1]);
         HttpRequest request = HttpRequest.newBuilder()
@@ -85,7 +82,7 @@ public class ServerFacade {
 
     }
 
-    public Collection<GameData> list() {
+    public Collection<GameData> list() throws ConnectException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + "/game"))
                 .GET()
@@ -122,7 +119,7 @@ public class ServerFacade {
         return gameDataCollection;
     }
 
-    public boolean join(String[] args) {
+    public boolean join(String[] args) throws ConnectException {
         JsonObject json = new JsonObject();
         json.addProperty("playerColor", args[1]);
         json.addProperty("gameID", args[2]);
@@ -134,17 +131,17 @@ public class ServerFacade {
         return response.statusCode() == 200;
     }
 
-    public ChessGame observe(String[] args) {
+    public GameData observe(String[] args) throws ConnectException {
         Collection<GameData> chessGameCollection = list();
         for (GameData gameData : chessGameCollection) {
             if (gameData.gameID() == Integer.parseInt(args[1])) {
-                return gameData.game();
+                return gameData;
             }
         }
         return null;
     }
 
-    public boolean logout() {
+    public boolean logout() throws ConnectException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + "/session"))
                 .DELETE()
@@ -153,7 +150,7 @@ public class ServerFacade {
         HttpResponse<String> response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
         return response.statusCode() == 200;
     }
-    public boolean clear() {
+    public boolean clear() throws ConnectException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + "/db"))
                 .DELETE()
