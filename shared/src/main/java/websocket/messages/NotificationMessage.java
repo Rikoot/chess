@@ -5,9 +5,9 @@ import java.util.Objects;
 public class NotificationMessage extends ServerMessage{
     private final String notificationMessage;
 
-    public NotificationMessage(ServerMessageType type, String errorMessage) {
+    public NotificationMessage(ServerMessageType type, String notificationMessage) {
         super(type);
-        this.notificationMessage = errorMessage;
+        this.notificationMessage = notificationMessage;
     }
 
     public String getNotificationMessage() {

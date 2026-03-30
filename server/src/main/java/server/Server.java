@@ -10,6 +10,7 @@ import model.results.CreateResult;
 import model.results.ListResult;
 import model.results.LoginResult;
 import model.results.RegisterResult;
+import server.websocket.WebSocketHandler;
 import service.AuthService;
 import service.GameService;
 import service.UserService;
@@ -23,6 +24,7 @@ public class Server {
     AuthService authService;
     GameService gameService;
     Gson serializer = new Gson();
+    private final WebSocketHandler webSocketHandler;
 
     public Server() {
         try {
@@ -32,6 +34,7 @@ public class Server {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
+        webSocketHandler = new WebSocketHandler(userService, authService, gameService);
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
@@ -49,6 +52,12 @@ public class Server {
         javalin.put("/game", this::handleJoinGame);
         // DELETE /db Clear DB
         javalin.delete("/db", this::handleClearDb);
+        // WS /ws Websocket
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(webSocketHandler);
+            ws.onClose(webSocketHandler);
+        });
         // Error handler
         javalin.exception(RuntimeException.class, (e,ctx) -> {
             ErrorData errorData = new ErrorData("Error: Internal Error");
