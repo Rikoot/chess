@@ -4,9 +4,12 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
+import java.util.Collection;
+import java.util.Objects;
+
 public class PrintGame {
 
-    public static String print(ChessGame game, ChessGame.TeamColor teamColor) {
+    public static String print(ChessGame game, ChessGame.TeamColor teamColor, Collection<ChessPosition> positions) {
         StringBuilder output = new StringBuilder();
         int rowStart = 8;
         int rowEnd = 0;
@@ -29,6 +32,7 @@ public class PrintGame {
         }
         String blackTile = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
         String whiteTile = EscapeSequences.SET_BG_COLOR_RED;
+        boolean tileColor = true;
         String tileBackgroundColor = whiteTile;
         for (int row = rowStart; row != rowEnd; row += direction) {
             output.append(backgroundColor);
@@ -36,12 +40,17 @@ public class PrintGame {
             output.append(row);
             output.append(" ");
             for (int col = colStart; col != colEnd; col -= direction) {
+                ChessPosition position = new ChessPosition(row, col);
+                if (positions.contains(position)) {
+                    tileBackgroundColor = (tileColor) ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY_GREEN_TINT : EscapeSequences.SET_BG_COLOR_RED_GREEN_TINT;
+                }
                 output.append(tileBackgroundColor);
                 if (col != colEnd + direction) {
-                    tileBackgroundColor = (tileBackgroundColor.equals(blackTile))
+                    tileBackgroundColor = (tileColor)
                             ? whiteTile : blackTile;
+                    tileColor = !tileColor;
                 }
-                ChessPiece piece = game.getBoard().getPiece(new ChessPosition(row, col));
+                ChessPiece piece = game.getBoard().getPiece(position);
                 output.append(convertPiece(piece));
             }
             output.append(backgroundColor);
