@@ -51,6 +51,31 @@ public class GameSQLDAO {
         return gameDataCollection;
     }
 
+    public GameData getGame(int gameID) throws DataAccessException{
+        String statement = "SELECT * FROM Games WHERE gameID = ?";
+        Connection conn = null;
+        try {
+            conn = DatabaseManager.getConnection();
+        } catch (DataAccessException e) {
+            throw new RuntimeException();
+        }
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement(statement);
+            preparedStatement.setInt(1, gameID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (!resultSet.next()) {
+                throw new DataAccessException("Error: Game ID Not Valid");
+            }
+            return new GameData(resultSet.getInt("gameID"),
+                    resultSet.getString("whiteUsername"),
+                    resultSet.getString("blackUsername"),
+                    resultSet.getString("gameName"),
+                    serializer.fromJson(resultSet.getString("game"), ChessGame.class));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public int createGame(String gameName) throws DataAccessException{
         ChessGame newGame = new ChessGame();
         int gameID = 0;
@@ -111,18 +136,35 @@ public class GameSQLDAO {
                     throw new DataAccessException("Error: Color Already Taken");
                 }
             }
-            statement = "REPLACE INTO Games VALUES (?, ?, ?, ?, ?);";
-            preparedStatement = conn.prepareStatement(statement);
-            preparedStatement.setInt(1, gameData.gameID());
-            preparedStatement.setString(2, gameData.whiteUsername());
-            preparedStatement.setString(3, gameData.blackUsername());
-            preparedStatement.setString(4, gameData.gameName());
-            preparedStatement.setString(5, serializer.toJson(gameData.game()));
-            preparedStatement.executeUpdate();
+            if (!updateGame(gameData)) {
+                throw new SQLException("Error occurred");
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean updateGame(GameData game) {
+        Connection conn = null;
+        String statement = "REPLACE INTO Games VALUES (?, ?, ?, ?, ?);";
+        try {
+            conn = DatabaseManager.getConnection();
+        } catch (DataAccessException e) {
+            return false;
+        }
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement(statement);
+            preparedStatement.setInt(1, game.gameID());
+            preparedStatement.setString(2, game.whiteUsername());
+            preparedStatement.setString(3, game.blackUsername());
+            preparedStatement.setString(4, game.gameName());
+            preparedStatement.setString(5, serializer.toJson(game.game()));
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            return false;
+        }
+        return true;
     }
 
     public void clearDb() throws DataAccessException {
