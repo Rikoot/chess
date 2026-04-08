@@ -20,7 +20,6 @@ import java.util.Scanner;
 public class WebSocketFacade extends Endpoint {
     private Session session;
     private final Gson gson;
-    private int gameID;
     private GameData gameData;
     private String authToken;
     private ChessGame.TeamColor teamColor;
@@ -63,7 +62,6 @@ public class WebSocketFacade extends Endpoint {
     }
 
     public void send(MakeMoveCommand message) throws IOException {
-        gameID = message.getGameID();
         session.getBasicRemote().sendText(gson.toJson(message));
     }
 
@@ -80,10 +78,15 @@ public class WebSocketFacade extends Endpoint {
         Scanner scanner = new Scanner(System.in);
         try {
             send(new MakeMoveCommand(UserGameCommand.CommandType.CONNECT, authToken, gameData.gameID(), null));
-            while (leaveStatus) {
-                System.out.print("[In game] >>>> ");
-                String userInput = scanner.nextLine();
-                String[] userArgs = userInput.split(" ");
+        } catch (IOException e) {
+            System.out.println("An error occurred, try again.");
+            return;
+        }
+        while (leaveStatus) {
+            System.out.print("[In game] >>>> ");
+            String userInput = scanner.nextLine();
+            String[] userArgs = userInput.split(" ");
+            try {
                 switch (userArgs[0]) {
                     case "draw" -> handleDraw();
                     case "leave" -> {
@@ -96,9 +99,9 @@ public class WebSocketFacade extends Endpoint {
                     case "help" -> printGameHelp();
                     default -> System.out.println("Invalid command option, enter help for more information");
                 }
+            } catch (IOException e) {
+                System.out.println("An error occurred, try again.");
             }
-        } catch (IOException e) {
-            System.out.println("An error occurred, try again.");
         }
     }
 
@@ -161,10 +164,10 @@ public class WebSocketFacade extends Endpoint {
                 ChessMove move = new ChessMove(startPosition, endPosition, pieceType);
                 send(new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE,
                         authToken, gameData.gameID(), move));
+                return;
             }
-        } else {
-            System.out.println("Invalid command arguments, enter help for more information");
         }
+        System.out.println("Invalid command arguments, enter help for more information");
     }
     private ChessPosition convertNotation(String positionString) {
         int col = positionString.toLowerCase().charAt(0) - 'a' + 1;
