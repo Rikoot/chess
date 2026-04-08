@@ -21,6 +21,7 @@ public class ChessGameDeserializer implements JsonDeserializer<ChessGame> {
             case ("WHITE") -> chessGame.setTeamTurn(ChessGame.TeamColor.WHITE);
             case ("BLACK") -> chessGame.setTeamTurn(ChessGame.TeamColor.BLACK);
         }
+        chessGame.playable = jsonObject.get("playable").getAsBoolean();
         return chessGame;
     }
 

@@ -32,7 +32,7 @@ public class PrintGame {
         }
         String blackTile = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
         String whiteTile = EscapeSequences.SET_BG_COLOR_RED;
-        boolean tileColor = true;
+        boolean tileColor = false;
         String tileBackgroundColor = whiteTile;
         for (int row = rowStart; row != rowEnd; row += direction) {
             output.append(backgroundColor);

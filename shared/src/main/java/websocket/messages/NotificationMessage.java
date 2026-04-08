@@ -2,7 +2,7 @@ package websocket.messages;
 
 import java.util.Objects;
 
-public class NotificationMessage extends ServerMessage{
+public class NotificationMessage extends ServerMessage {
     private final String message;
 
     public NotificationMessage(ServerMessageType type, String message) {

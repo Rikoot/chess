@@ -2,23 +2,24 @@ package server.websocket;
 
 import chess.ChessGame;
 import chess.ChessGameDeserializer;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dataaccess.DataAccessException;
 import io.javalin.websocket.*;
 import model.AuthData;
 import model.GameData;
-import model.requests.ListRequest;
 import org.eclipse.jetty.websocket.api.Session;
 import service.AuthService;
 import service.GameService;
 import service.UserService;
 import websocket.commands.MakeMoveCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Objects;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
@@ -67,72 +68,165 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void connect(MakeMoveCommand command, Session session) throws IOException {
         AuthData authData = authService.validateSession(command.getAuthToken());
         if (Objects.nonNull(authData)) {
-               connectionManager.addSessionToGame(session, command.getGameID());
-            NotificationMessage msg = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                    "ℹ️: A new user just joined: "+ authData.username());
-            connectionManager.broadcastToGame(session, msg, command.getGameID());
-            sendGame(session, command.getGameID());
-        } else {
-            sendMessage(session, "⚠️:An error occurred joining.");
+            int gameID = command.getGameID();
+            GameData game = null;
+            try {
+                game = gameService.getGame(gameID);
+            } catch (DataAccessException e) {
+                // continue to error below
+            }
+            if (Objects.nonNull(game)) {
+                connectionManager.addSessionToGame(session, gameID);
+                String username = authData.username();
+                String role = "Observer";
+                if (Objects.equals(game.blackUsername(), username)) {
+                    role = "Black";
+                } else if (Objects.equals(game.whiteUsername(), username)) {
+                    role = "White";
+                }
+                NotificationMessage msg = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                        "ℹ️: A new user just joined: " + username + " as: " + role);
+                connectionManager.broadcastToGame(session, msg, gameID);
+                sendGame(session, gameID);
+                return;
+            }
         }
+        sendError(session, "⚠️:An error occurred joining.");
     }
 
     private void leave(MakeMoveCommand command, Session session) throws IOException {
         AuthData authData = authService.validateSession(command.getAuthToken());
-        if (Objects.nonNull(authData)) {
-            connectionManager.removeSessionFromGame(session, command.getGameID());
-            NotificationMessage msg = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                    authData.username() + " just left!");
-            connectionManager.broadcastToGame(session, msg, command.getGameID());
-        } else {
-            sendMessage(session,"⚠️: An error occurred leaving.");
+        try {
+            if (Objects.nonNull(authData)) {
+                GameData gameData = gameService.getGame(command.getGameID());
+                if (authData.username().equals(gameData.whiteUsername())) {
+                    gameData = gameData.setWhiteUsername(null);
+                } else if (authData.username().equals(gameData.blackUsername())) {
+                    gameData.setBlackUsername(null);
+                }
+                gameService.updateGame(gameData);
+                connectionManager.removeSessionFromGame(session, command.getGameID());
+                NotificationMessage msg = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                        authData.username() + " just left!");
+                connectionManager.broadcastToGame(session, msg, command.getGameID());
+                return;
+            }
+        } catch (DataAccessException e) {
+            // continue
         }
+        sendError(session,"⚠️: An error occurred leaving.");
     }
 
     private void resign(MakeMoveCommand command, Session session) throws IOException {
         AuthData authData = authService.validateSession(command.getAuthToken());
-        if (Objects.nonNull(authData)) {
-            connectionManager.removeSessionFromGame(session, command.getGameID());
-            NotificationMessage msg = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                    authData.username() + " just resigned!");
-            connectionManager.broadcastToGame(session, msg, command.getGameID());
-        } else {
-            sendMessage(session,"⚠️: An error occurred resigning.");
+        try {
+            if (Objects.nonNull(authData)) {
+                GameData gameData = gameService.getGame(command.getGameID());
+                if (!gameData.game().playable) {
+                    String stateNotif = "Game is already resigned";
+                    connectionManager.broadcastToGame(session,
+                            new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, stateNotif), command.getGameID());
+                    return;
+                }
+                checkPlayer(authData, gameData);
+                gameData.game().resign();
+                gameService.updateGame(gameData);
+                NotificationMessage msg = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                        authData.username() + " just resigned!");
+                connectionManager.broadcastToGame(null, msg, command.getGameID());
+                connectionManager.removeSessionFromGame(session, command.getGameID());
+                return;
+            }
+        } catch (InvalidMoveException | DataAccessException e) {
+            // continue to error
         }
+        sendError(session,"⚠️: An error occurred resigning.");
     }
 
     private void makeMove(MakeMoveCommand command, Session session) throws IOException {
         AuthData authData = authService.validateSession(command.getAuthToken());
-        if (Objects.nonNull(authData)) { 
-            
-        } else {
-            sendMessage(session,"⚠️: An error occurred making a move.");
+        if (Objects.nonNull(authData)) {
+            try {
+                GameData gameData = gameService.getGame(command.getGameID());
+                ChessGame game = gameData.game();
+                if (!game.playable) {
+                    String stateNotif = "Game is already resigned";
+                    connectionManager.broadcastToGame(session,
+                            new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, stateNotif), command.getGameID());
+                    return;
+                }
+                try {
+                    checkPlayer(authData, gameData);
+                    ChessGame.TeamColor teamColor = game.getTeamTurn();
+                    String state;
+                    if (game.isInCheck(teamColor)) {
+                        state = "check";
+                    } else if (game.isInCheckmate(teamColor)) {
+                        state = "checkmate";
+                    } else if (game.isInStalemate(teamColor)) {
+                        state = "stalemate";
+                    } else {
+                        state =  null;
+                    }
+                    game.makeMove(command.getMove());
+                    if (!gameService.updateGame(gameData)) {
+                        throw  new DataAccessException("Update Error");
+                    }
+                    connectionManager.sendGame(new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game), command.getGameID());
+                    String moveNotif = teamColor.toString() + " made a move: " + command.getMove().toString();
+                    connectionManager.broadcastToGame(session,
+                            new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, moveNotif), command.getGameID());
+                    if (Objects.nonNull(state)) {
+                        String stateNotif = teamColor + " is in " + state;
+                        connectionManager.broadcastToGame(session,
+                                new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, stateNotif), command.getGameID());
+                    }
+                    return;
+                } catch (InvalidMoveException e) {
+                    // continue to error below
+                }
+            } catch (DataAccessException e) {
+                // continue to error below
+            }
         }
+        sendError(session,"⚠️: An error occurred making a move.");
     }
 
-    private void sendMessage(Session session, String message) throws IOException {
-        NotificationMessage mgs = new NotificationMessage(ServerMessage.ServerMessageType.ERROR, message);
+
+    private void sendError(Session session, String message) throws IOException {
+        ErrorMessage mgs = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
         session.getRemote().sendString(gson.toJson(mgs));
     }
 
     private void sendGame(Session session, int gameID) throws IOException {
         ChessGame game = null;
         try {
-            Collection<GameData> games = gameService.listGames(new ListRequest("jab-aorok")).games();
-            for (GameData gameData : games) {
-                if (gameData.gameID() == gameID) {
-                    game = gameData.game();
-                }
-            }
+            game = gameService.getGame(gameID).game();
         } catch (DataAccessException e) {
             // continue to error below
         }
         if (Objects.nonNull(game)) {
-            NotificationMessage gameMsg = new NotificationMessage(ServerMessage.ServerMessageType.LOAD_GAME,
-                    gson.toJson(game));
+            LoadGameMessage gameMsg = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME,
+                    game);
             session.getRemote().sendString(gson.toJson(gameMsg));
+            return;
+        }
+        sendError(session, "⚠️: An error occurred sending a game");
+    }
+
+    private void checkPlayer(AuthData authData, GameData gameData) throws InvalidMoveException {
+        ChessGame game = gameData.game();
+
+        if (authData.username().equals(gameData.whiteUsername())) {
+            if (game.getTeamTurn() != ChessGame.TeamColor.WHITE) {
+                throw new InvalidMoveException("Invalid Turn");
+            }
+        } else if (authData.username().equals(gameData.blackUsername())) {
+            if (game.getTeamTurn() != ChessGame.TeamColor.BLACK) {
+                throw new InvalidMoveException("Invalid Turn");
+            }
         } else {
-            sendMessage(session, "⚠️: An error occurred sending a game");
+            throw new InvalidMoveException("Invalid Player");
         }
     }
 }
