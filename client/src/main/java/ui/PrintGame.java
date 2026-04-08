@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class PrintGame {
 
-    public static String print(ChessGame game, ChessGame.TeamColor teamColor, Collection<ChessPosition> positions) {
+    public static String print(ChessGame game, ChessGame.TeamColor teamColor, Collection<ChessPosition> positions, ChessPosition startPosition) {
         StringBuilder output = new StringBuilder();
         int rowStart = 8;
         int rowEnd = 0;
@@ -43,6 +43,8 @@ public class PrintGame {
                 ChessPosition position = new ChessPosition(row, col);
                 if (positions.contains(position)) {
                     tileBackgroundColor = (tileColor) ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY_GREEN_TINT : EscapeSequences.SET_BG_COLOR_RED_GREEN_TINT;
+                } else if (position.equals(startPosition)) {
+                    tileBackgroundColor = EscapeSequences.SET_BG_COLOR_YELLOW;
                 }
                 output.append(tileBackgroundColor);
                 if (col != colEnd + direction) {

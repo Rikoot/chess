@@ -2,11 +2,9 @@ package client;
 
 import chess.*;
 import model.GameData;
-import ui.PrintGame;
 
 import java.net.ConnectException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 
 public class RequestHandlers {
@@ -144,7 +142,6 @@ public class RequestHandlers {
                 } else {
                     teamColor = ChessGame.TeamColor.WHITE;
                 }
-                System.out.println(PrintGame.print(gameData.game(), teamColor, new HashSet<>()));
                 GameHandler.playGame(gameData, teamColor);
             } else {
                 httpError();
@@ -170,7 +167,6 @@ public class RequestHandlers {
             if (gameData == null) {
                 httpError();
             } else {
-                System.out.println(PrintGame.print(gameData.game(), ChessGame.TeamColor.WHITE, new HashSet<>()));
                 GameHandler.playGame(gameData, ChessGame.TeamColor.WHITE);
             }
         } else {

@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class GameHandler {
     public static void playGame(GameData gameData, ChessGame.TeamColor teamColor) {
-        System.out.println(PrintGame.print(gameData.game(), teamColor, new HashSet<>()));
+        System.out.println(PrintGame.print(gameData.game(), teamColor, new HashSet<>(), null));
         boolean leaveStatus = true;
         Scanner scanner = new Scanner(System.in);
         while (leaveStatus) {
@@ -20,7 +20,7 @@ public class GameHandler {
             String[] userArgs = userInput.split(" ");
             switch (userArgs[0]) {
                 case "draw" ->
-                        System.out.println(PrintGame.print(gameData.game(), teamColor, new HashSet<>()));
+                        System.out.println(PrintGame.print(gameData.game(), teamColor, new HashSet<>(), null));
                 case "leave" -> {
                     handleLeave();
                     leaveStatus = false;
@@ -71,7 +71,7 @@ public class GameHandler {
                         positions.add(move.getEndPosition());
                     }
                 }
-                System.out.print(PrintGame.print(gameData.game(), teamColor, positions));
+                System.out.print(PrintGame.print(gameData.game(), teamColor, positions, position));
                 return;
             }
         }
