@@ -64,4 +64,9 @@ public class ChessMove {
     public String toString() {
         return startPosition.toString() + " " + endPosition.toString() + (Objects.nonNull(promotionPiece) ? promotionPiece.toString() : "");
     }
+    public String moveNotifString() {
+        return startPosition.moveNotifString() + " " + endPosition.moveNotifString() + " " +
+                (Objects.nonNull(promotionPiece) ? promotionPiece.toString() : "");
+    }
+
 }

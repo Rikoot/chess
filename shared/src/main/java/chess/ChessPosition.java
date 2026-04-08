@@ -51,4 +51,8 @@ public class ChessPosition {
     public int getColumn() {
         return positionColumn;
     }
+
+    public String moveNotifString() {
+        return "" + (char) ('a' + positionColumn - 1) + positionRow;
+    }
 }

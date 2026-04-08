@@ -182,7 +182,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                         throw new DataAccessException("Update Error");
                     }
                     connectionManager.sendGame(new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game), command.getGameID());
-                    String moveNotif = teamColor.toString() + " made a move: " + command.getMove().toString();
+                    String moveNotif = teamColor + " made a move: " + command.getMove().moveNotifString();
                     connectionManager.broadcastToGame(session,
                             new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, moveNotif), command.getGameID());
                     if (Objects.nonNull(state)) {
