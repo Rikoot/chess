@@ -42,7 +42,9 @@ public class PrintGame {
             for (int col = colStart; col != colEnd; col -= direction) {
                 ChessPosition position = new ChessPosition(row, col);
                 if (positions.contains(position)) {
-                    tileBackgroundColor = (tileColor) ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY_GREEN_TINT : EscapeSequences.SET_BG_COLOR_RED_GREEN_TINT;
+                    tileBackgroundColor = (tileColor)
+                            ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY_GREEN_TINT
+                            : EscapeSequences.SET_BG_COLOR_RED_GREEN_TINT;
                 } else if (position.equals(startPosition)) {
                     tileBackgroundColor = EscapeSequences.SET_BG_COLOR_YELLOW;
                 }

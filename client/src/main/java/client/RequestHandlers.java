@@ -108,7 +108,8 @@ public class RequestHandlers {
     }
 
     public static void handleJoin(ServerFacade serverFacade, boolean loggedIn,
-                                  String[] userArgs, String username, Collection<GameData> gameDataCollection, WebSocketFacade webSocketFacade) throws ConnectException {
+                                  String[] userArgs, String username,
+                                  Collection<GameData> gameDataCollection, WebSocketFacade webSocketFacade) throws ConnectException {
         if (loggedIn && userArgs.length == 3) {
             if (gameDataCollection == null) {
                 System.out.println("List games first!");
@@ -153,7 +154,8 @@ public class RequestHandlers {
     }
 
     public static void handleObserve(ServerFacade serverFacade, boolean loggedIn,
-                                     String[] userArgs, Collection<GameData> gameDataCollection, WebSocketFacade webSocketFacade) throws ConnectException {
+                                     String[] userArgs, Collection<GameData> gameDataCollection,
+                                     WebSocketFacade webSocketFacade) throws ConnectException {
         if (loggedIn && userArgs.length == 2) {
             if (gameDataCollection == null) {
                 System.out.println("List games first!");

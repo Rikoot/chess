@@ -26,7 +26,6 @@ public class WebSocketFacade extends Endpoint {
 
     public WebSocketFacade(URI uri, Collection<GameData> gameDataCollection) {
         GsonBuilder gsonBuilder = new GsonBuilder();
-        //gsonBuilder.registerTypeAdapter(NotificationMessage.class, new ServerMessageDeserializer());
         gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameDeserializer());
         gson = gsonBuilder.create();
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();

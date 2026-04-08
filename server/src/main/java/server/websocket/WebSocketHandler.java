@@ -154,15 +154,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                         throw new InvalidMoveException("Unplayable game");
                     }
                     ChessGame.TeamColor teamColor = game.getTeamTurn();
-                    if (authData.username().equals(gameData.whiteUsername())) {
-                        if (teamColor != ChessGame.TeamColor.WHITE) {
-                            throw new InvalidMoveException("Invalid Turn");
-                        }
-                    } else if (authData.username().equals(gameData.blackUsername())) {
-                        if (teamColor != ChessGame.TeamColor.BLACK) {
-                            throw new InvalidMoveException("Invalid Turn");
-                        }
-                    } else {
+                    final boolean whiteEquals = authData.username().equals(gameData.whiteUsername());
+                    final boolean blackEquals = authData.username().equals(gameData.blackUsername());
+                    if (whiteEquals
+                            && teamColor != ChessGame.TeamColor.WHITE) {
+                        throw new InvalidMoveException("Invalid Turn");
+                    } else if (blackEquals
+                            && teamColor != ChessGame.TeamColor.BLACK) {
+                        throw new InvalidMoveException("Invalid Turn");
+                    } else if (!whiteEquals
+                            && !blackEquals) {
                         throw new InvalidMoveException("Invalid Player");
                     }
                     game.makeMove(command.getMove());
