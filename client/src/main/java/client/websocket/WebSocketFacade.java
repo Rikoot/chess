@@ -26,7 +26,8 @@ public class WebSocketFacade extends Endpoint {
 
     public WebSocketFacade(URI uri, Collection<GameData> gameDataCollection) {
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(ChessGame.class, new ServerMessageDeserializer());
+        //gsonBuilder.registerTypeAdapter(NotificationMessage.class, new ServerMessageDeserializer());
+        gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameDeserializer());
         gson = gsonBuilder.create();
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         try {
@@ -57,6 +58,7 @@ public class WebSocketFacade extends Endpoint {
                         handleDraw();
                     }
                 }
+                System.out.print("[In game] >>>> ");
             }
         });
     }
@@ -73,7 +75,6 @@ public class WebSocketFacade extends Endpoint {
         this.gameData = gameData;
         this.teamColor = teamColor;
         this.authToken = authToken;
-        handleDraw();
         boolean leaveStatus = true;
         Scanner scanner = new Scanner(System.in);
         try {
@@ -150,22 +151,31 @@ public class WebSocketFacade extends Endpoint {
         System.out.println("Invalid command arguments, enter help for more information");
     }
     private void handleMove(String[] userArgs) throws IOException {
-        if (userArgs.length <= 4 && userArgs.length >= 3) {
-            if (userArgs[1].length() == 2 && userArgs[2].length() == 2 && userArgs[3].length() <= 1) {
-                ChessPosition startPosition = convertNotation(userArgs[1]);
-                ChessPosition endPosition = convertNotation(userArgs[2]);
-                ChessPiece.PieceType pieceType= switch (userArgs[3].toUpperCase()) {
+        ChessPiece.PieceType pieceType = null;
+        switch (userArgs.length) {
+            case 4:
+                if (userArgs[3].length() != 1) {
+                    break;
+                }
+                pieceType = switch (userArgs[3].toUpperCase()) {
                     case "Q" -> ChessPiece.PieceType.QUEEN;
                     case "R" -> ChessPiece.PieceType.ROOK;
                     case "N" -> ChessPiece.PieceType.KNIGHT;
                     case "B" -> ChessPiece.PieceType.BISHOP;
                     default -> null;
                 };
+            case 3:
+                if (userArgs[1].length() != 2 || userArgs[2].length() != 2) {
+                    break;
+                }
+                ChessPosition startPosition = convertNotation(userArgs[1]);
+                ChessPosition endPosition = convertNotation(userArgs[2]);
                 ChessMove move = new ChessMove(startPosition, endPosition, pieceType);
                 send(new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE,
                         authToken, gameData.gameID(), move));
                 return;
-            }
+            default:
+                return;
         }
         System.out.println("Invalid command arguments, enter help for more information");
     }

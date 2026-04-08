@@ -54,7 +54,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 case LEAVE -> leave(command, ctx.session);
                 case RESIGN -> resign(command, ctx.session);
                 case MAKE_MOVE -> makeMove(command, ctx.session);
-
             }
         } catch (IOException ex) {
             System.err.println(ex.getMessage());
@@ -168,12 +167,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     }
                     game.makeMove(command.getMove());
                     String state;
-                    teamColor = game.getTeamTurn();
-                    if (game.isInStalemate(teamColor)) {
+                    ChessGame.TeamColor nextColor = game.getTeamTurn();
+                    if (game.isInStalemate(nextColor)) {
                         state = "stalemate";
-                    } else if (game.isInCheckmate(teamColor)) {
+                    } else if (game.isInCheckmate(nextColor)) {
                         state = "checkmate";
-                    } else if (game.isInCheck(teamColor)) {
+                    } else if (game.isInCheck(nextColor)) {
                         state = "check";
                     } else {
                         state =  null;
@@ -186,7 +185,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     connectionManager.broadcastToGame(session,
                             new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, moveNotif), command.getGameID());
                     if (Objects.nonNull(state)) {
-                        String stateNotif = teamColor + " is in " + state;
+                        String stateNotif = nextColor + " is in " + state;
                         connectionManager.broadcastToGame(null,
                                 new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, stateNotif), command.getGameID());
                     }
