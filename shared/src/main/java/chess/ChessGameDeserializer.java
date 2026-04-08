@@ -43,7 +43,7 @@ public class ChessGameDeserializer implements JsonDeserializer<ChessGame> {
         }
         ChessPiece chessPiece = new ChessPiece(pieceColor, pieceType);
 
-        chessBoard.addPiece(new ChessPosition(keyPosition.charAt(1),keyPosition.charAt(3)),
+        chessBoard.addPiece(new ChessPosition(keyPosition.charAt(1) - '0', keyPosition.charAt(3) - '0'),
                 chessPiece);
     }
 }

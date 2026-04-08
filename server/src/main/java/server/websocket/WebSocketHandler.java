@@ -20,6 +20,7 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.util.Objects;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
@@ -123,12 +124,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             if (Objects.nonNull(authData)) {
                 GameData gameData = gameService.getGame(command.getGameID());
                 if (!gameData.game().playable) {
-                    String stateNotif = "Game is already resigned";
-                    connectionManager.broadcastToGame(session,
-                            new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, stateNotif), command.getGameID());
-                    return;
+                    throw new InvalidMoveException("Unplayable game");
                 }
-                checkPlayer(authData, gameData);
+                if (!authData.username().equals(gameData.whiteUsername())
+                        && !authData.username().equals(gameData.blackUsername())) {
+                    throw new InvalidMoveException("Invalid Player");
+                }
                 gameData.game().resign();
                 gameService.updateGame(gameData);
                 NotificationMessage msg = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
@@ -149,15 +150,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             try {
                 GameData gameData = gameService.getGame(command.getGameID());
                 ChessGame game = gameData.game();
-                if (!game.playable) {
-                    String stateNotif = "Game is already resigned";
-                    connectionManager.broadcastToGame(session,
-                            new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, stateNotif), command.getGameID());
-                    return;
-                }
                 try {
-                    checkPlayer(authData, gameData);
+                    if (!game.playable) {
+                        throw new InvalidMoveException("Unplayable game");
+                    }
                     ChessGame.TeamColor teamColor = game.getTeamTurn();
+                    if (authData.username().equals(gameData.whiteUsername())) {
+                        if (teamColor != ChessGame.TeamColor.WHITE) {
+                            throw new InvalidMoveException("Invalid Turn");
+                        }
+                    } else if (authData.username().equals(gameData.blackUsername())) {
+                        if (teamColor != ChessGame.TeamColor.BLACK) {
+                            throw new InvalidMoveException("Invalid Turn");
+                        }
+                    } else {
+                        throw new InvalidMoveException("Invalid Player");
+                    }
                     String state;
                     if (game.isInCheck(teamColor)) {
                         state = "check";
@@ -170,7 +178,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     }
                     game.makeMove(command.getMove());
                     if (!gameService.updateGame(gameData)) {
-                        throw  new DataAccessException("Update Error");
+                        throw new DataAccessException("Update Error");
                     }
                     connectionManager.sendGame(new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game), command.getGameID());
                     String moveNotif = teamColor.toString() + " made a move: " + command.getMove().toString();
@@ -214,19 +222,4 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         sendError(session, "⚠️: An error occurred sending a game");
     }
 
-    private void checkPlayer(AuthData authData, GameData gameData) throws InvalidMoveException {
-        ChessGame game = gameData.game();
-
-        if (authData.username().equals(gameData.whiteUsername())) {
-            if (game.getTeamTurn() != ChessGame.TeamColor.WHITE) {
-                throw new InvalidMoveException("Invalid Turn");
-            }
-        } else if (authData.username().equals(gameData.blackUsername())) {
-            if (game.getTeamTurn() != ChessGame.TeamColor.BLACK) {
-                throw new InvalidMoveException("Invalid Turn");
-            }
-        } else {
-            throw new InvalidMoveException("Invalid Player");
-        }
-    }
 }

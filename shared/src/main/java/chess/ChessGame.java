@@ -96,8 +96,12 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        playable = false;
-        return ChessRules.isInCheckmate(board, teamColor);
+        if (ChessRules.isInCheckmate(board, teamColor)) {
+            playable = false;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -108,8 +112,12 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        playable = false;
-        return ChessRules.isInStalemate(board, teamColor);
+        if (ChessRules.isInStalemate(board, teamColor)) {
+            playable = false;
+            return true;
+        } else {
+            return false;
+        }
     }
     /**
      * Sets this game's chessboard with a given board
