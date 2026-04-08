@@ -1,8 +1,10 @@
 package client;
 
+import client.websocket.WebSocketFacade;
 import model.GameData;
 
 import java.net.ConnectException;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Scanner;
 
@@ -13,6 +15,7 @@ public class ClientMain {
     private static boolean quitStatus;
     private static String username;
     private static ServerFacade serverFacade;
+    private static WebSocketFacade webSocketFacade;
 
     public static void main(String[] args) {
         System.out.println("Welcome to rikoot's chess client.\nType help to get started.");
@@ -21,6 +24,13 @@ public class ClientMain {
             serverUrl = args[0];
         }
         serverFacade = new ServerFacade(serverUrl);
+        try {
+            String url = serverUrl.replace("http", "ws");
+            URI socketURI = new URI(url + "/ws");
+            webSocketFacade = new WebSocketFacade(socketURI, gameDataCollection);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         Scanner scanner = new Scanner(System.in);
         loggedIn = false;
         quitStatus = true;
@@ -71,11 +81,11 @@ public class ClientMain {
             }
 
             case "join" -> {
-                RequestHandlers.handleJoin(serverFacade, loggedIn, userArgs, username, gameDataCollection);
+                RequestHandlers.handleJoin(serverFacade, loggedIn, userArgs, username, gameDataCollection, webSocketFacade);
             }
 
             case "observe" -> {
-                RequestHandlers.handleObserve(serverFacade, loggedIn, userArgs, gameDataCollection);
+                RequestHandlers.handleObserve(serverFacade, loggedIn, userArgs, gameDataCollection, webSocketFacade);
             }
 
             case "logout" -> {

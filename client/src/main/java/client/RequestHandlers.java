@@ -1,6 +1,7 @@
 package client;
 
 import chess.*;
+import client.websocket.WebSocketFacade;
 import model.GameData;
 
 import java.net.ConnectException;
@@ -107,7 +108,7 @@ public class RequestHandlers {
     }
 
     public static void handleJoin(ServerFacade serverFacade, boolean loggedIn,
-                                  String[] userArgs, String username, Collection<GameData> gameDataCollection) throws ConnectException {
+                                  String[] userArgs, String username, Collection<GameData> gameDataCollection, WebSocketFacade webSocketFacade) throws ConnectException {
         if (loggedIn && userArgs.length == 3) {
             if (gameDataCollection == null) {
                 System.out.println("List games first!");
@@ -142,7 +143,7 @@ public class RequestHandlers {
                 } else {
                     teamColor = ChessGame.TeamColor.WHITE;
                 }
-                GameHandler.playGame(gameData, teamColor);
+                webSocketFacade.playGame(gameData, teamColor, serverFacade.getAuthToken());
             } else {
                 httpError();
             }
@@ -152,7 +153,7 @@ public class RequestHandlers {
     }
 
     public static void handleObserve(ServerFacade serverFacade, boolean loggedIn,
-                                     String[] userArgs,Collection<GameData> gameDataCollection) throws ConnectException {
+                                     String[] userArgs, Collection<GameData> gameDataCollection, WebSocketFacade webSocketFacade) throws ConnectException {
         if (loggedIn && userArgs.length == 2) {
             if (gameDataCollection == null) {
                 System.out.println("List games first!");
@@ -167,7 +168,7 @@ public class RequestHandlers {
             if (gameData == null) {
                 httpError();
             } else {
-                GameHandler.playGame(gameData, ChessGame.TeamColor.WHITE);
+                webSocketFacade.playGame(gameData, ChessGame.TeamColor.WHITE, serverFacade.getAuthToken());
             }
         } else {
             argsError();

@@ -159,4 +159,7 @@ public class ServerFacade {
         return response.statusCode() == 200;
     }
 
+    public String getAuthToken() {
+        return authToken;
+    }
 }
