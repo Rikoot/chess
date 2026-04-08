@@ -11,7 +11,7 @@ public class ChessGameDeserializer implements JsonDeserializer<ChessGame> {
                                  JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         ChessGame chessGame = new ChessGame();
-        ChessBoard chessBoard = chessGame.getBoard();
+        ChessBoard chessBoard = new ChessBoard();
         JsonObject jsonBoard = jsonObject.get("board").getAsJsonObject().get("board").getAsJsonObject();
         for (String key : jsonBoard.keySet()) {
             addChessPosition(chessBoard, key, jsonBoard.get(key));
