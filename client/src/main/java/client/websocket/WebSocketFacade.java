@@ -127,21 +127,31 @@ public class WebSocketFacade extends Endpoint {
     }
 
     private void handleResign() throws IOException {
-        send(new MakeMoveCommand(UserGameCommand.CommandType.RESIGN,
-                authToken, gameData.gameID(), null));
+        System.out.print("Are you sure you want to resign? (Y/N): ");
+        Scanner scanner = new Scanner(System.in);
+        String userInput = scanner.nextLine();
+        if (userInput.equalsIgnoreCase("Y")) {
+            send(new MakeMoveCommand(UserGameCommand.CommandType.RESIGN,
+                    authToken, gameData.gameID(), null));
+        } else {
+            System.out.println("Okay!");
+        }
     }
 
     private void handleLegal(String[] userArgs) {
         if (userArgs.length == 2) {
             if (userArgs[1].length() == 2) {
                 ChessPosition position = convertNotation(userArgs[1]);
-                ChessBoard board = gameData.game().getBoard();
-                ChessPiece piece = board.getPiece(position);
+//                ChessBoard board = gameData.game().getBoard();
+//                ChessPiece piece = board.getPiece(position);
                 Collection<ChessPosition> positions = new HashSet<>();
-                if (Objects.nonNull(piece)) {
-                    for (ChessMove move : piece.pieceMoves(board, position)) {
-                        positions.add(move.getEndPosition());
-                    }
+//                if (Objects.nonNull(piece)) {
+//                    for (ChessMove move : piece.pieceMoves(board, position)) {
+//                        positions.add(move.getEndPosition());
+//                    }
+//                }
+                for (ChessMove move : gameData.game().validMoves(position)) {
+                    positions.add(move.getEndPosition());
                 }
                 System.out.print(PrintGame.print(gameData.game(), teamColor, positions, position));
                 return;

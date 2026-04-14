@@ -181,12 +181,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     if (!gameService.updateGame(gameData)) {
                         throw new DataAccessException("Update Error");
                     }
+                    String username = (nextColor == ChessGame.TeamColor.WHITE) ? gameData.whiteUsername() : gameData.blackUsername();
                     connectionManager.sendGame(new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game), command.getGameID());
-                    String moveNotif = teamColor + " made a move: " + command.getMove().moveNotifString();
+                    String moveNotif = username + " made a move: " + command.getMove().moveNotifString();
                     connectionManager.broadcastToGame(session,
                             new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, moveNotif), command.getGameID());
                     if (Objects.nonNull(state)) {
-                        String stateNotif = nextColor + " is in " + state;
+                        String stateNotif = username + " is in " + state;
                         connectionManager.broadcastToGame(null,
                                 new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, stateNotif), command.getGameID());
                     }
